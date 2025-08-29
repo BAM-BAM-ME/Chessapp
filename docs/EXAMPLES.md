@@ -1,6 +1,6 @@
-# EXEMPLE
+# EXAMPLES
 
-## 1) `Data/appsettings.json` (extins)
+## 1) `Data/appsettings.json` (extended)
 ```json
 {
   "EnginePath": "Engines/stockfish.exe",
@@ -15,25 +15,25 @@
 }
 ```
 
-## 2) `Data/profiles.json` (mai multe profiluri)
+## 2) `Data/profiles.json` (multiple profiles)
 ```json
 [
   {
     "name": "Titan Max",
     "uci": { "Threads": 12, "Hash": 4096, "Ponder": true, "MultiPV": 1 },
-    "book": { "enabled": true, "allow": ["C60..C99", "D30..D69"] },
+    "book": { "path": "Books/titan.bin", "allow": ["C60..C99", "D30..D69"] },
     "move_policy": { "deterministic": true, "top_k": 1 }
   },
   {
     "name": "Aggressive A",
     "uci": { "Threads": 8, "Hash": 2048, "Ponder": false, "MultiPV": 4 },
-    "book": { "enabled": true, "allow": ["E20..E69"] },
+    "book": { "allow": ["E20..E69"] },
     "move_policy": { "deterministic": false, "top_k": 3 }
   },
   {
     "name": "Human-Elo 2000",
     "uci": { "Threads": 6, "Hash": 1024, "Ponder": false, "MultiPV": 2 },
-    "book": { "enabled": false, "allow": [] },
+    "book": { "allow": [] },
     "move_policy": { "deterministic": false, "top_k": 2 }
   }
 ]

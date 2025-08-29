@@ -1,9 +1,11 @@
-# Jurnal modificări
+# Changelog
 
-Toate schimbările notabile vor fi documentate aici.
+All notable changes will be documented in this file.
 
-## [Neeliberat]
+## [Unreleased]
+### Docs
+- Harmonized profile schema and examples; added JSON Schema files.
 
 ## [v0.1.0] - 2025-08-29
-- Pachet inițial de documentație (RO)
-- Detaliere handshake UCI și ghiduri CI/packaging
+- Initial documentation package (RO)
+- Detailed UCI handshake and CI/packaging guides

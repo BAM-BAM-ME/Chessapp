@@ -1,5 +1,8 @@
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
@@ -8,7 +11,7 @@ using Chessapp.Interop;
 
 namespace Gui
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private readonly GameController _game = new GameController();
         private readonly EngineHost _engine = new EngineHost();
@@ -17,10 +20,25 @@ namespace Gui
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
+        private string _analysisHeader = "Engine idle";
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string AnalysisHeader
+        {
+            get => _analysisHeader;
+            set
+            {
+                if (_analysisHeader == value) return;
+                _analysisHeader = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisHeader)));
+            }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
             _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
@@ -52,10 +70,16 @@ namespace Gui
             TxtInfo.AppendText(line + Environment.NewLine);
             TxtInfo.ScrollToEnd();
 
-            if (_insightsEnabled)
+            var upd = UciParser.TryParseInfo(line);
+            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
             {
-                var upd = UciParser.TryParseInfo(line);
-                if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+                var moves = upd.Pv.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(4);
+                var pv = string.Join(' ', moves);
+                string eval = upd.ScoreMate
+                    ? $"M{upd.ScoreCp}"
+                    : (upd.ScoreCp / 100.0).ToString("0.00", CultureInfo.InvariantCulture);
+                AnalysisHeader = $"{upd.Depth} | {eval} | {pv}";
+                if (_insightsEnabled)
                 {
                     int? cp = upd.ScoreMate ? null : upd.ScoreCp;
                     int? mate = upd.ScoreMate ? upd.ScoreCp : null;
@@ -127,6 +151,7 @@ namespace Gui
             {
                 AppendInfo($"Engine sent impossible bestmove: {bestmove}");
             }
+            AnalysisHeader = "Engine idle";
         }
 
         private async void BtnAnalyze_Click(object sender, RoutedEventArgs e)
@@ -151,6 +176,7 @@ namespace Gui
                 await _engine.SendAsync("stop");
             }
             _analyzing = false;
+            AnalysisHeader = "Engine idle";
         }
 
         private void BtnLoadEngine_Click(object sender, RoutedEventArgs e)

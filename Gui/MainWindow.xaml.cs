@@ -1,5 +1,8 @@
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 /add-engine-selection-modal-to-settings-ui
@@ -22,6 +25,20 @@ namespace Gui
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
+ codex/bind-analysis-summary-to-board-header
+        private string _analysisHeader = "Engine idle";
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string AnalysisHeader
+        {
+            get => _analysisHeader;
+            set
+            {
+                if (_analysisHeader == value) return;
+                _analysisHeader = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisHeader)));
+
         private readonly StringBuilder _engineLog = new StringBuilder();
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -32,6 +49,7 @@ namespace Gui
         {
             _engineLog.AppendLine(line);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EngineLog)));
+ main
         }
 
         public MainWindow()
@@ -70,10 +88,21 @@ namespace Gui
             TxtInfo.ScrollToEnd();
 
             var upd = UciParser.TryParseInfo(line);
+codex/bind-analysis-summary-to-board-header
+            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+            {
+                var moves = upd.Pv.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(4);
+                var pv = string.Join(' ', moves);
+                string eval = upd.ScoreMate
+                    ? $"M{upd.ScoreCp}"
+                    : (upd.ScoreCp / 100.0).ToString("0.00", CultureInfo.InvariantCulture);
+                AnalysisHeader = $"{upd.Depth} | {eval} | {pv}";
+
             if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv))
             {
                 var score = upd.ScoreMate ? $"mate {upd.ScoreCp}" : $"cp {upd.ScoreCp}";
                 AppendEngineLog($"d{upd.Depth} {score} {upd.Pv}");
+ main
                 if (_insightsEnabled)
                 {
                     int? cp = upd.ScoreMate ? null : upd.ScoreCp;
@@ -152,6 +181,7 @@ namespace Gui
             {
                 AppendInfo($"Engine sent impossible bestmove: {bestmove}");
             }
+            AnalysisHeader = "Engine idle";
         }
 
         private async void BtnAnalyze_Click(object sender, RoutedEventArgs e)
@@ -181,6 +211,7 @@ namespace Gui
                 await SendCommandAsync("stop");
             }
             _analyzing = false;
+            AnalysisHeader = "Engine idle";
         }
 
         private void BtnSettings_Click(object sender, RoutedEventArgs e)

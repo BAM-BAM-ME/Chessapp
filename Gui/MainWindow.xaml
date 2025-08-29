@@ -52,9 +52,21 @@
       </TabControl>
     </StackPanel>
 
+codex/bind-analysis-summary-to-board-header
+    <Grid Grid.Column="1" Margin="8">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+      <TextBlock Text="{Binding AnalysisHeader}" Margin="0,0,0,8" FontWeight="Bold"/>
+      <controls:BoardControl x:Name="Board" Grid.Row="1"/>
+    </Grid>
+  </Grid>
+
  main
 
       <controls:BoardControl x:Name="Board" Grid.Column="1" Margin="8"/>
     </Grid>
   </DockPanel>
+main
 </Window>

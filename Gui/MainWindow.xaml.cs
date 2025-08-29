@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
-using Microsoft.Extensions.Logging;
 using Core;
 using Interop;
 
@@ -11,24 +10,20 @@ namespace Gui
 {
     public partial class MainWindow : Window
     {
-        private readonly ILogger _logger;
-        private readonly GameController _game;
-        private readonly EngineHost _engine;
+        private readonly GameController _game = new GameController();
+        private readonly EngineHost _engine = new EngineHost();
         private InsightsService _insights = new InsightsService();
         private readonly System.Windows.Threading.DispatcherTimer _insightsTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
 
-        public MainWindow(ILogger<MainWindow>? logger = null)
+        public MainWindow()
         {
-            _logger = logger ?? Logging.Factory.CreateLogger<MainWindow>();
-            _game = new GameController();
-            _engine = new EngineHost();
             InitializeComponent();
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
-            _engine.BestMoveReceived += move => Dispatcher.Invoke(() => OnBestMove(move));
+            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
             _insightsTimer.Tick += async (_, __) =>
             {
@@ -37,7 +32,6 @@ namespace Gui
             };
             _insightsTimer.Start();
             LoadSettings();
-            _logger.LogInformation("MainWindow initialized");
         }
 
         private void LoadSettings()
@@ -58,18 +52,15 @@ namespace Gui
             TxtInfo.AppendText(line + Environment.NewLine);
             TxtInfo.ScrollToEnd();
 
-            var upd = UciParser.TryParseInfo(line);
-            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && upd.MultiPv == 1)
+            if (_insightsEnabled)
             {
-                string score = upd.ScoreMate ? $"M{upd.ScoreCp}" : (upd.ScoreCp / 100.0).ToString("0.00");
-                TxtPv.Text = $"d{upd.Depth} {score} {upd.Pv}"; // TODO: bind via MVVM
-            }
-
-            if (_insightsEnabled && upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
-            {
-                int? cp = upd.ScoreMate ? null : upd.ScoreCp;
-                int? mate = upd.ScoreMate ? upd.ScoreCp : null;
-                _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
+                var upd = UciParser.TryParseInfo(line);
+                if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+                {
+                    int? cp = upd.ScoreMate ? null : upd.ScoreCp;
+                    int? mate = upd.ScoreMate ? upd.ScoreCp : null;
+                    _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
+                }
             }
         }
 
@@ -99,7 +90,7 @@ namespace Gui
                     AppendInfo("Engine not found. Set the path with the Engine button.");
                     throw new FileNotFoundException("stockfish.exe missing");
                 }
-                await Task.Run(() => _engine.Start(_enginePath)); // avoid blocking UI thread
+                _engine.Start(_enginePath);
             }
         }
 
@@ -125,9 +116,8 @@ namespace Gui
             }
         }
 
-        private void OnBestMove(string bestmove)
+        private async Task OnBestMove(string bestmove)
         {
-            TxtPv.Text = $"best {bestmove}"; // TODO: bind via MVVM
             if (_analyzing) return;
             if (_game.ApplyEngineMove(bestmove))
             {

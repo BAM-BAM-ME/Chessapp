@@ -36,7 +36,7 @@ public class GameControllerTests
     {
         var gc = new GameController();
         gc.NewGame();
-        gc.ApplyEngineMove("g8f6");
+        Assert.True(gc.ApplyEngineMove("g8f6"));
         Assert.Equal("position startpos moves g8f6", gc.ToUciPositionCommand());
     }
 
@@ -47,7 +47,7 @@ public class GameControllerTests
         gc.NewGame();
         string? notified = null;
         gc.EngineMoveApplied += m => notified = m;
-        gc.ApplyEngineMove("g8f6");
+        Assert.True(gc.ApplyEngineMove("g8f6"));
         Assert.Equal("g8f6", notified);
     }
 }

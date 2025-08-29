@@ -19,13 +19,13 @@ public class GameController
     // Very small move list so the GUI can build a UCI "position" command.
     private readonly List<string> _moves = new();
 
-/add-method-to-apply-engine-move
+
     /// <summary>Raised whenever an engine move is applied.</summary>
     public event Action<string>? EngineMoveApplied;
 
     public GameController(ILogger<GameController>? logger = null)
-        => _logger = logger ?? Logging.Factory.CreateLogger<GameController>();
- main
+        
+ 
 
     /// <summary>Resets to the initial chess position.</summary>
     public void NewGame()
@@ -56,9 +56,13 @@ public class GameController
         var s = uci.Trim();
         if (s.Length is 4 or 5)
         {
-            _moves.Add(s);
-            // TODO: Update FEN based on moves (out of current scope)
-            return true;
+            if (FenUtility.TryApplyMove(Fen, s, out var newFen))
+            {
+                _moves.Add(s);
+                Fen = newFen;
+                return true;
+            }
+            return false;
         }
         return false;
     }

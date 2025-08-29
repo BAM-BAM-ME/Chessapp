@@ -2,13 +2,15 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.ComponentModel;
+using System.Text;
 using Microsoft.Win32;
 using Chessapp.Core;
 using Chessapp.Interop;
 
 namespace Gui
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private readonly GameController _game = new GameController();
         private readonly EngineHost _engine = new EngineHost();
@@ -17,13 +19,25 @@ namespace Gui
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
+        private readonly StringBuilder _engineLog = new StringBuilder();
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string EngineLog => _engineLog.ToString();
+
+        private void AppendEngineLog(string line)
+        {
+            _engineLog.AppendLine(line);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EngineLog)));
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
-            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
+            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => { AppendEngineLog($"bestmove {move}"); await OnBestMove(move); });
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
             _insightsTimer.Tick += async (_, __) =>
             {
@@ -52,10 +66,12 @@ namespace Gui
             TxtInfo.AppendText(line + Environment.NewLine);
             TxtInfo.ScrollToEnd();
 
-            if (_insightsEnabled)
+            var upd = UciParser.TryParseInfo(line);
+            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv))
             {
-                var upd = UciParser.TryParseInfo(line);
-                if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+                var score = upd.ScoreMate ? $"mate {upd.ScoreCp}" : $"cp {upd.ScoreCp}";
+                AppendEngineLog($"d{upd.Depth} {score} {upd.Pv}");
+                if (_insightsEnabled)
                 {
                     int? cp = upd.ScoreMate ? null : upd.ScoreCp;
                     int? mate = upd.ScoreMate ? upd.ScoreCp : null;
@@ -64,13 +80,19 @@ namespace Gui
             }
         }
 
+        private async Task SendCommandAsync(string cmd)
+        {
+            await _engine.SendAsync(cmd);
+            AppendEngineLog($"> {cmd}");
+        }
+
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             _analyzing = false;
             await EnsureEngineAsync();
-            await _engine.SendAsync("uci");
+            await SendCommandAsync("uci");
             await _engine.ExpectAsync("uciok", TimeSpan.FromSeconds(3));
-            await _engine.SendAsync("isready");
+            await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
 
             var cfg = ConfigService.LoadAppSettings();
@@ -97,8 +119,8 @@ namespace Gui
         private async Task GoAsync()
         {
             var posCmd = _game.ToUciPositionCommand();
-            await _engine.SendAsync(posCmd);
-            await _engine.SendAsync("go movetime 1000");
+            await SendCommandAsync(posCmd);
+            await SendCommandAsync("go movetime 1000");
         }
 
         private async void OnUserMoveRequested(string from, string to, string? promo)
@@ -133,22 +155,22 @@ namespace Gui
         {
             _analyzing = true;
             await EnsureEngineAsync();
-            await _engine.SendAsync("uci");
+            await SendCommandAsync("uci");
             await _engine.ExpectAsync("uciok", TimeSpan.FromSeconds(3));
-            await _engine.SendAsync("isready");
+            await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
             var cfg = ConfigService.LoadAppSettings();
             await _engine.ApplyCommonOptionsAsync(cfg);
-            await _engine.SendAsync(_game.ToUciPositionCommand());
-            await _engine.SendAsync("setoption name MultiPV value 3");
-            await _engine.SendAsync("go infinite");
+            await SendCommandAsync(_game.ToUciPositionCommand());
+            await SendCommandAsync("setoption name MultiPV value 3");
+            await SendCommandAsync("go infinite");
         }
 
         private async void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             if (_engine.IsRunning)
             {
-                await _engine.SendAsync("stop");
+                await SendCommandAsync("stop");
             }
             _analyzing = false;
         }

@@ -39,7 +39,7 @@ See [BUILD.md](docs/BUILD.md) for detailed instructions and [PROFILES.md](docs/P
 Run the PowerShell script to produce an MSIX package:
 
 ```powershell
-Scripts\build-msix.ps1
+Scripts/build-msix.ps1
 ```
 
 The packaged artifacts are written to the `artifacts` folder.

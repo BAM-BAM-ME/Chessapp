@@ -12,10 +12,17 @@ namespace Interop
         public int Nodes { get; set; }
         public int Nps { get; set; }
         public int TbHits { get; set; }
+        public int HashFull { get; set; }
         public string Pv { get; set; } = string.Empty;
         public string RootMove { get; set; } = string.Empty;
         public int MultiPv { get; set; } = 1;
         public int TimeMs { get; set; }
+    }
+
+    public class BestMove
+    {
+        public string Move { get; set; } = string.Empty;
+        public string Ponder { get; set; } = string.Empty;
     }
 
     public static class UciParser
@@ -35,6 +42,7 @@ namespace Interop
                 else if (t == "nodes" && i+1 < parts.Length && int.TryParse(parts[i+1], out var n)) { upd.Nodes = n; i++; }
                 else if (t == "nps" && i+1 < parts.Length && int.TryParse(parts[i+1], out var nps)) { upd.Nps = nps; i++; }
                 else if (t == "tbhits" && i+1 < parts.Length && int.TryParse(parts[i+1], out var tb)) { upd.TbHits = tb; i++; }
+                else if (t == "hashfull" && i+1 < parts.Length && int.TryParse(parts[i+1], out var hf)) { upd.HashFull = hf; i++; }
                 else if (t == "multipv" && i+1 < parts.Length && int.TryParse(parts[i+1], out var mpv)) { upd.MultiPv = mpv; i++; }
                 else if (t == "time" && i+1 < parts.Length && int.TryParse(parts[i+1], out var tm)) { upd.TimeMs = tm; i++; }
                 else if (t == "score" && i+1 < parts.Length)
@@ -51,6 +59,23 @@ namespace Interop
                 }
             }
             return upd;
+        }
+
+        public static BestMove? TryParseBestMove(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("bestmove ")) return null;
+            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2) return null;
+            var bm = new BestMove { Move = parts[1] };
+            for (int i = 2; i < parts.Length - 1; i++)
+            {
+                if (parts[i] == "ponder")
+                {
+                    bm.Ponder = parts[i + 1];
+                    break;
+                }
+            }
+            return bm;
         }
     }
 }

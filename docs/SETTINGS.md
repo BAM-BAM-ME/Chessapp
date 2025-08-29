@@ -12,8 +12,6 @@ Documents the keys in `Data/appsettings.json`.
 - `ProfilesPath`: `string` — default `Data/profiles.json`
 - `LearnDb`: `string` — default `Data/learn.db`
 
-> Alias for scripts: `engine.path` (equivalent to `EnginePath`). Keep them in sync.
-
 ## Extended example
 ```json
 {

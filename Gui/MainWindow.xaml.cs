@@ -2,9 +2,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+/add-engine-selection-modal-to-settings-ui
+
 using System.ComponentModel;
 using System.Text;
 using Microsoft.Win32;
+main
 using Chessapp.Core;
 using Chessapp.Interop;
 
@@ -160,10 +163,15 @@ namespace Gui
             await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
             var cfg = ConfigService.LoadAppSettings();
-            await _engine.ApplyCommonOptionsAsync(cfg);
+/add-engine-selection-modal-to-settings-ui
+            await _engine.SendAsync(_game.ToUciPositionCommand());
+            await _engine.SendAsync("setoption name MultiPV value 3");
+            await _engine.SendAsync($"go depth {cfg.Depth}");
+
             await SendCommandAsync(_game.ToUciPositionCommand());
             await SendCommandAsync("setoption name MultiPV value 3");
             await SendCommandAsync("go infinite");
+ main
         }
 
         private async void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -175,15 +183,13 @@ namespace Gui
             _analyzing = false;
         }
 
-        private void BtnLoadEngine_Click(object sender, RoutedEventArgs e)
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new OpenFileDialog { Filter = "Engine (*.exe)|*.exe" };
-            if (ofd.ShowDialog() == true)
+            var dlg = new SettingsWindow();
+            if (dlg.ShowDialog() == true)
             {
-                _enginePath = ofd.FileName;
                 var cfg = ConfigService.LoadAppSettings();
-                cfg.EnginePath = _enginePath;
-                ConfigService.SaveAppSettings(cfg);
+                _enginePath = cfg.EnginePath;
                 AppendInfo($"Engine set: {_enginePath}");
             }
         }

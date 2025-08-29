@@ -1,20 +1,3 @@
-# File Path
-
-`Interop/Interop.csproj`
-
-# Source of Truth
-
-Chessapp repo — Interop project.
-
-# Why Replace
-
-Keep `Interop` strict with `TreatWarningsAsErrors` while Core is temporarily baselined. This preserves high quality for interop/process code paths where correctness and resource handling are critical.
-
----
-
-## Replacement (full file content)
-
-```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -22,21 +5,7 @@ Keep `Interop` strict with `TreatWarningsAsErrors` while Core is temporarily bas
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
-    <!-- Interop depends on Core for shared contracts (no reverse reference) -->
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>
-```
-
----
-
-## Validation steps
-
-1. Save, commit, push.
-2. CI should continue to treat new warnings in `Interop` as errors.
-
-## Notes
-
-No additional suppressions are added here; fix warnings in `Interop` as they arise.

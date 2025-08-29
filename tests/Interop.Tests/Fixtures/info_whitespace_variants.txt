@@ -1,0 +1,3 @@
+info   depth 20    score cp 42   foo bar   pv e2e4 e7e5  
+info depth   15  score   mate  -1    pv a2a1q   
+info tbhits   7   nodes  100  unknown token pv d2d4   

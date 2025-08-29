@@ -27,7 +27,8 @@ Controls the allowlist of ECO codes. When `allow` is empty, no ECO filtering is 
 **Notes**
 - `allow` **must** be an array of strings. An empty list means "no restriction".
 - Recommended validation pattern: `^[A-E][0-9]{2}(\.\.[A-E][0-9]{2})?$`.
-- Recommended: keep `MultiPV ≥ top_k` in profiles where you select from the top-k list.
+- When `move_policy.top_k > 1`, the engine will request `MultiPV = top_k` during play and pick among those lines.
+- Recommended: keep `MultiPV ≥ top_k` in profiles where you select from the top‑k list.
 
 ## Example profile
 ```json

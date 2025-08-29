@@ -8,6 +8,7 @@ namespace Core
     {
         private readonly List<string> _uciMoves = new();
         private readonly char[] _board = new char[64]; // a8..h1
+        private readonly List<Candidate> _candidates = new();
         public string Fen { get; private set; } = string.Empty;
 
         public void NewGame()
@@ -32,14 +33,28 @@ namespace Core
             return true;
         }
 
-        public bool ApplyEngineMove(string bestmove)
+        public bool ApplyEngineMove(string bestmove, MovePolicy? policy = null, int seed = 0)
         {
             var uci = bestmove.Trim();
+            if (policy != null && policy.TopK > 1 && _candidates.Count > 0)
+            {
+                var sel = CandidateSelector.Select(_candidates, policy, seed);
+                if (sel != null) uci = sel.Move;
+            }
             if (string.IsNullOrWhiteSpace(uci) || uci == "(none)") return false;
             if (!ApplyUciMove(uci)) return false;
             _uciMoves.Add(uci);
             Fen = BuildFen();
             return true;
+        }
+
+        public void IngestInfo(Interop.InfoUpdate info)
+        {
+            if (info.MultiPv <= 0 || string.IsNullOrWhiteSpace(info.RootMove)) return;
+            var cand = new Candidate(info.RootMove, info.ScoreCp, info.MultiPv);
+            int idx = _candidates.FindIndex(c => c.Rank == info.MultiPv);
+            if (idx >= 0) _candidates[idx] = cand; else _candidates.Add(cand);
+            _candidates.Sort((a, b) => a.Rank.CompareTo(b.Rank));
         }
 
         private static int CoordToIndex(string coord)

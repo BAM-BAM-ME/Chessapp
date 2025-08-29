@@ -25,7 +25,7 @@ public class GameController
 
     public GameController(ILogger<GameController>? logger = null)
         
- main
+ 
 
     /// <summary>Resets to the initial chess position.</summary>
     public void NewGame()

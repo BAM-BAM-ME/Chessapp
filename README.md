@@ -10,8 +10,19 @@ ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such a
 - [Visual Studio 2022](https://visualstudio.microsoft.com/)
 - Optional UCI engine such as [`stockfish.exe`](https://stockfishchess.org/)
 
+codex/update-readme-quickstart-and-packaging-sections
 ### Run
 1. Clone the repo:
+
+1. Optionally place the engine at `Engines/stockfish.exe` with:
+
+   ```powershell
+   pwsh Scripts/prepare-engine.ps1 -Path C:\path\to\stockfish.exe
+   ```
+
+   or edit `Data/appsettings.json` to set `AppSettings.EnginePath`.
+2. Build the GUI:
+ main
 
    ```powershell
    git clone <repo-url>

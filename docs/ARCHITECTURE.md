@@ -1,39 +1,36 @@
-# ARHITECTURĂ
+# Architecture
 
 ```
 GUI (WPF)
-   │
+   │ moves
    ▼
-Core (GameController, ConfigService, ProfileService, PgnService)
-   │        ▲
-   │        │ Setări (appsettings.json), Profiluri (profiles.json)
+GameController (Core)
+   │ FEN & move list
    ▼
-Interop (EngineHost ⇄ UciParser ⇄ ProcessSupervisor)
-   │
-   ▼  (stdin/stdout, protocol UCI)
-Motor UCI (ex.: Stockfish)
+EngineHost (Interop) ⇄ UciParser
+   │ UCI lines
+   ▼
+Stockfish (UCI engine)
 ```
 
-## Proiecte din soluție
-- **Gui** — prezentare WPF (tablă, panou analiză, selector profil).
-- **Core** — logică domeniu:
-  - `GameController`: menține lista de mutări, construiește `position startpos [moves ...]`, actualizează FEN; rocade, promoții, euristică en passant.
-  - `ConfigService` / `AppSettings`: încărcare `Data/appsettings.json`.
-  - `ProfileService`: încărcare `Data/profiles.json`.
-  - `PgnService`: utilitare de scriere PGN (schelet).
-- **Interop** — proces & protocol:
-  - `EngineHost`: start/stop motor, comenzi (`uci`, `isready`, `setoption`, `position`, `go`), citire linii, evenimente.
-  - `UciParser`: parsează `info` (cp/mate, depth/seldepth, multipv, nps, tbhits, time, pv).
-  - `ProcessSupervisor`: repornește motorul la crash cu retry limitat.
+## Layers
+- **GUI (WPF)** – board, analysis panel and profile selector.
+- **Core** – maintains game state through `GameController` and issues engine commands.
+- **Interop** – `EngineHost` spawns the engine process while `UciParser` translates plain-text protocol lines.
 
-## Fire & evenimente
-- I/O de motor pe task-uri de fundal; UI primește evenimente marshal-uite pe Dispatcher (WPF).
-- Evenimente tip: `EngineReady`, `InfoReceived(InfoUpdate)`, `BestMoveReceived`, `EngineCrashed`.
+## Runtime sequence
+1. GUI reports a user move to `GameController`.
+2. `GameController` updates the move list and FEN, then calls `EngineHost` with `position` and `go`.
+3. `EngineHost` writes UCI commands and reads responses from the engine.
+4. Stockfish returns `info` and `bestmove` lines that `UciParser` parses and propagates back to `GameController` and the GUI.
 
-## Logging
-- Logging minim structurat la granița interop: start/exit proces, pașii handshake, erori de parse, setoption, `bestmove`.
+## Data
+- **UCI lines** – commands and responses over stdin/stdout.
+- **FEN** – board snapshot built after each move.
+- **Move list** – sequential moves that reproduce the position.
 
-## Presupuneri & limite
-- Motorul respectă UCI și este accesibil prin `EnginePath`.
-- `SyzygyPath` este opțional; când este setat, motorul suportă TB.
-- Profilurile pot include `deterministic/top_k`; selecția stocastică se face în Core.
+## Extensibility
+- Swap any UCI engine by configuring its path.
+- Extend `GameController` for custom move policies or state persistence.
+- Add new GUI panels that subscribe to `GameController` events.
+- Expand `UciParser` to support additional protocol options.

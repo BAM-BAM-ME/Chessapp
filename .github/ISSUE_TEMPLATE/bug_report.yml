@@ -1,0 +1,43 @@
+name: Bug report
+description: File a reproducible bug report.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the sections below.
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: v1.2.3
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the issue and what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: OS, .NET version
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log output
+      render: shell
+

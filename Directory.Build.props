@@ -1,38 +1,6 @@
-# File Path
-
-`Directory.Build.props`
-
-# Source of Truth
-
-Chessapp repo root — solution-wide MSBuild configuration.
-
-# Why Replace
-
-Establish a consistent analyzer level across all projects. This centralizes `AnalysisLevel` and `Nullable` so individual projects stay minimal.
-
----
-
-## Replacement (full file content)
-
-```xml
 <Project>
   <PropertyGroup>
-    <!-- Use the newest analyzer set available on the runner -->
     <AnalysisLevel>latest-all</AnalysisLevel>
-    <!-- Opt into nullable reference types across the solution -->
     <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>
-```
-
----
-
-## Validation steps
-
-1. Commit the file at the solution root.
-2. Push a branch and open a PR.
-3. Confirm the build step restores and compiles without introducing new warnings beyond the per-project configuration.
-
-## Notes
-
-This file intentionally keeps policy lightweight; more rules can be added later when Core suppressions are reduced.

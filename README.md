@@ -33,8 +33,14 @@ ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such a
 
 3. Build & run:
 
+codex/align-namespaces-in-gui-files
    * **Visual Studio:** set **Gui** as the startup project and run (F5).
    * **CLI (optional):**
+
+```powershell
+Scripts/build-msix.ps1
+```
+main
 
      ```powershell
      dotnet build

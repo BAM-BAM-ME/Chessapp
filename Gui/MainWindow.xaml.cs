@@ -104,14 +104,15 @@ namespace Gui
         private async void OnUserMoveRequested(string from, string to, string? promo)
         {
             if (_analyzing) return;
-            if (_game.TryApplyUserMove(from, to, promo))
+            var uci = (from ?? string.Empty) + (to ?? string.Empty) + (promo ?? string.Empty);
+            if (_game.TryApplyUserMove(uci))
             {
                 Board.SetPosition(_game.Fen);
                 await GoAsync();
             }
             else
             {
-                AppendInfo($"Invalid move: {from}-{to}");
+                AppendInfo($"Invalid move: {uci}");
             }
         }
 

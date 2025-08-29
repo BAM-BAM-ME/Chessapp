@@ -6,7 +6,13 @@ ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such a
 
 **Prerequisites:** Windows 10/11 x64, [.NET 8 SDK](https://dotnet.microsoft.com/), optional [`stockfish.exe`](https://stockfishchess.org/).
 
-1. Optionally place the engine at `Engines/stockfish.exe` **or** edit `Data/appsettings.json` to set `AppSettings.EnginePath`.
+1. Optionally place the engine at `Engines/stockfish.exe` with:
+
+   ```powershell
+   pwsh Scripts/prepare-engine.ps1 -Path C:\path\to\stockfish.exe
+   ```
+
+   or edit `Data/appsettings.json` to set `AppSettings.EnginePath`.
 2. Build the GUI:
 
    ```bash

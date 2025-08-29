@@ -1,17 +1,16 @@
-# RELEASING
+# Releasing
 
-## Versionare
-- SemVer: MAJOR.MINOR.PATCH
+Steps to cut a pre-release build.
 
-## Checklist
-- [ ] CI verde pe `main`
-- [ ] Actualizează `CHANGELOG.md`
-- [ ] Etichetează versiunea `vX.Y.Z`
-- [ ] Build Release + MSIX
-- [ ] Atașează artefactele
-
-## Comenzi utile
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
+1. Choose the next semantic version and create a tag:
+   ```bash
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+2. GitHub Actions builds the project and publishes an unsigned MSIX artifact.
+3. Download the MSIX from the workflow run.
+4. On Windows, enable Developer Mode and install the package manually:
+   ```powershell
+   Add-AppxPackage .\ChessApp.msix
+   ```
+   The package is unsigned and intended only for testing.

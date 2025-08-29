@@ -5,7 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+/add-engine-selection-modal-to-settings-ui
+
+using System.ComponentModel;
+using System.Text;
 using Microsoft.Win32;
+main
 using Chessapp.Core;
 using Chessapp.Interop;
 
@@ -20,6 +25,7 @@ namespace Gui
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
+ codex/bind-analysis-summary-to-board-header
         private string _analysisHeader = "Engine idle";
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -32,7 +38,18 @@ namespace Gui
                 if (_analysisHeader == value) return;
                 _analysisHeader = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisHeader)));
-            }
+
+        private readonly StringBuilder _engineLog = new StringBuilder();
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public string EngineLog => _engineLog.ToString();
+
+        private void AppendEngineLog(string line)
+        {
+            _engineLog.AppendLine(line);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EngineLog)));
+ main
         }
 
         public MainWindow()
@@ -41,7 +58,7 @@ namespace Gui
             DataContext = this;
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
-            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
+            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => { AppendEngineLog($"bestmove {move}"); await OnBestMove(move); });
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
             _insightsTimer.Tick += async (_, __) =>
             {
@@ -71,6 +88,7 @@ namespace Gui
             TxtInfo.ScrollToEnd();
 
             var upd = UciParser.TryParseInfo(line);
+codex/bind-analysis-summary-to-board-header
             if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
             {
                 var moves = upd.Pv.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(4);
@@ -79,6 +97,12 @@ namespace Gui
                     ? $"M{upd.ScoreCp}"
                     : (upd.ScoreCp / 100.0).ToString("0.00", CultureInfo.InvariantCulture);
                 AnalysisHeader = $"{upd.Depth} | {eval} | {pv}";
+
+            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv))
+            {
+                var score = upd.ScoreMate ? $"mate {upd.ScoreCp}" : $"cp {upd.ScoreCp}";
+                AppendEngineLog($"d{upd.Depth} {score} {upd.Pv}");
+ main
                 if (_insightsEnabled)
                 {
                     int? cp = upd.ScoreMate ? null : upd.ScoreCp;
@@ -88,13 +112,19 @@ namespace Gui
             }
         }
 
+        private async Task SendCommandAsync(string cmd)
+        {
+            await _engine.SendAsync(cmd);
+            AppendEngineLog($"> {cmd}");
+        }
+
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             _analyzing = false;
             await EnsureEngineAsync();
-            await _engine.SendAsync("uci");
+            await SendCommandAsync("uci");
             await _engine.ExpectAsync("uciok", TimeSpan.FromSeconds(3));
-            await _engine.SendAsync("isready");
+            await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
 
             var cfg = ConfigService.LoadAppSettings();
@@ -121,8 +151,8 @@ namespace Gui
         private async Task GoAsync()
         {
             var posCmd = _game.ToUciPositionCommand();
-            await _engine.SendAsync(posCmd);
-            await _engine.SendAsync("go movetime 1000");
+            await SendCommandAsync(posCmd);
+            await SendCommandAsync("go movetime 1000");
         }
 
         private async void OnUserMoveRequested(string from, string to, string? promo)
@@ -158,36 +188,39 @@ namespace Gui
         {
             _analyzing = true;
             await EnsureEngineAsync();
-            await _engine.SendAsync("uci");
+            await SendCommandAsync("uci");
             await _engine.ExpectAsync("uciok", TimeSpan.FromSeconds(3));
-            await _engine.SendAsync("isready");
+            await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
             var cfg = ConfigService.LoadAppSettings();
-            await _engine.ApplyCommonOptionsAsync(cfg);
+/add-engine-selection-modal-to-settings-ui
             await _engine.SendAsync(_game.ToUciPositionCommand());
             await _engine.SendAsync("setoption name MultiPV value 3");
-            await _engine.SendAsync("go infinite");
+            await _engine.SendAsync($"go depth {cfg.Depth}");
+
+            await SendCommandAsync(_game.ToUciPositionCommand());
+            await SendCommandAsync("setoption name MultiPV value 3");
+            await SendCommandAsync("go infinite");
+ main
         }
 
         private async void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             if (_engine.IsRunning)
             {
-                await _engine.SendAsync("stop");
+                await SendCommandAsync("stop");
             }
             _analyzing = false;
             AnalysisHeader = "Engine idle";
         }
 
-        private void BtnLoadEngine_Click(object sender, RoutedEventArgs e)
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new OpenFileDialog { Filter = "Engine (*.exe)|*.exe" };
-            if (ofd.ShowDialog() == true)
+            var dlg = new SettingsWindow();
+            if (dlg.ShowDialog() == true)
             {
-                _enginePath = ofd.FileName;
                 var cfg = ConfigService.LoadAppSettings();
-                cfg.EnginePath = _enginePath;
-                ConfigService.SaveAppSettings(cfg);
+                _enginePath = cfg.EnginePath;
                 AppendInfo($"Engine set: {_enginePath}");
             }
         }

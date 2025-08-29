@@ -1,12 +1,12 @@
 $ErrorActionPreference = 'Stop'
 
-# Resolve repo root and engine path without using pipeline into Join-Path (PS on runners may not bind it)
-$root   = Join-Path -Path $PSScriptRoot -ChildPath '..'
-$engine = Join-Path -Path $root        -ChildPath 'Engines\stockfish.exe'
+# Resolve repo root and engine path without piping into Join-Path
+$root = Split-Path -Parent $PSScriptRoot
+$engine = Join-Path $root 'Engines/stockfish.exe'
 
 if (Test-Path -LiteralPath $engine) {
     Write-Host 'Engine found, performing handshake...'
-    $p = Start-Process -FilePath $engine -NoNewWindow -RedirectStandardInput StandardInput -RedirectStandardOutput StandardOutput -PassThru
+    $p = Start-Process -FilePath $engine -NoNewWindow -RedirectStandardInput 'Pipe' -RedirectStandardOutput 'Pipe' -PassThru
     try {
         $p.StandardInput.WriteLine('uci')
         Start-Sleep -Milliseconds 200

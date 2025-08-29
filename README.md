@@ -2,9 +2,17 @@
 
 ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such as Stockfish 17.1. It currently offers a 2D board, human vs. computer play, basic analysis, JSON configuration and profiles, and is structured for future insights and learning features.
 
-## Quick Start
+## Quickstart
 
-**Prerequisites:** Windows 10/11 x64, [.NET 8 SDK](https://dotnet.microsoft.com/), optional [`stockfish.exe`](https://stockfishchess.org/).
+### Requirements
+- Windows 10/11 x64
+- [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/)
+- Optional UCI engine such as [`stockfish.exe`](https://stockfishchess.org/)
+
+codex/update-readme-quickstart-and-packaging-sections
+### Run
+1. Clone the repo:
 
 1. Optionally place the engine at `Engines/stockfish.exe` with:
 
@@ -14,20 +22,34 @@ ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such a
 
    or edit `Data/appsettings.json` to set `AppSettings.EnginePath`.
 2. Build the GUI:
+ main
 
-   ```bash
-   dotnet build
-   # or open ChessApp.sln in Visual Studio 2022 and run the Gui project
+   ```powershell
+   git clone <repo-url>
+   cd ChessApp
    ```
-3. Run:
-
-   ```bash
-   dotnet run --project Gui
-   ```
-
-The engine path is configured via `AppSettings.EnginePath`.
+   Open `ChessApp.sln` in Visual Studio 2022.
+2. Configure the engine path: place the engine at `Engines/stockfish.exe` **or** edit `Data/appsettings.json` and set `AppSettings.EnginePath`.
+3. Set **Gui** as the startup project and run (F5).
 
 See [BUILD.md](docs/BUILD.md) for detailed instructions and [PROFILES.md](docs/PROFILES.md) for profile definitions.
+
+## Packaging
+
+Run the PowerShell script to produce an MSIX package:
+
+```powershell
+Scripts\build-msix.ps1
+```
+
+The packaged artifacts are written to the `artifacts` folder.
+
+## Troubleshooting
+
+- Install the .NET 8 Desktop Runtime if the app fails to launch.
+- Ensure `AppSettings.EnginePath` points to a valid engine.
+- Visual Studio must include the ".NET desktop development" workload.
+- If PowerShell blocks scripts, run `Set-ExecutionPolicy -Scope Process RemoteSigned`.
 
 ## Key Files
 

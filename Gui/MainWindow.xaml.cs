@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Chessapp.Core;
-using Chessapp.Interop;
+using Core;
+using Interop;
 
 namespace Gui
 {

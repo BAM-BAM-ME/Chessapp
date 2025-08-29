@@ -1,0 +1,10 @@
+# ChessApp vX.Y.Z — 2025-08-29
+
+### Adăugări
+- ...
+
+### Reparări
+- ...
+
+### Note
+- Dacă pachetezi Stockfish → respectă obligațiile GPLv3 (vezi README).

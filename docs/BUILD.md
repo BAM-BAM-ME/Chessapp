@@ -1,42 +1,27 @@
 # BUILD
 
-## Prerechizite
-- Windows 10 sau mai nou
+## Prerequisites
+- Windows 10 or later
 - .NET 8 SDK
-- Executabil de motor UCI (ex.: `stockfish.exe`)
+- Optional UCI engine (`stockfish.exe`)
 
-## Configurare
-Editează `Data/appsettings.json` și setează `EnginePath` **sau** pune motorul la `Engines/stockfish.exe`.
-- **GUI disponibil:** la prima lansare, aplicația afișează un dialog de alegere a motorului și persistă calea în setări.
-- **Headless:** se folosește mereu calea din config.
+## Setup
+Copy `stockfish.exe` to `Engines/` **or** set `AppSettings.EnginePath` in `Data/appsettings.json`.
 
-### Exemplar minim `appsettings.json`
-```json
-{
-  "EnginePath": "Engines/stockfish.exe",
-  "Threads": 8,
-  "Hash": 1024,
-  "Ponder": true,
-  "MultiPV": 1
-}
+## Visual Studio
+1. Open `ChessApp.sln` in Visual Studio 2022.
+2. Build and run the `Gui` project.
+
+## CLI
+```bash
+dotnet build -c Release
+dotnet run --project Gui
 ```
 
-## Build
-- Deschide `ChessApp.sln` în Visual Studio 2022 sau folosește CLI:
-  ```bash
-  dotnet build -c Release
-  ```
+### Headless / smoke run
+The GUI is required for normal use, but CI performs a small headless smoke check using `Scripts/prepare-engine.ps1`. The script prepares the engine folder and can validate `AppSettings.EnginePath`.
 
-## Run & Quick Test
-1. Pornește aplicația.
-2. Verifică handshake-ul:
-   - `uci` → `uciok`
-   - `isready` → `readyok`
-3. Test scurt:
-   - `position startpos`
-   - `go movetime 1000` (sau `go infinite` + `stop`)
+## Notes
+- `SyzygyPath` should point to `.rtbw/.rtbz` files.
+- Profiles live in `Data/profiles.json`; see [PROFILES.md](PROFILES.md).
 
-## Note
-- **Syzygy:** setează `SyzygyPath` către folderul cu `.rtbw/.rtbz`.
-- **Profiluri:** asigură `Data/profiles.json`; vezi `PROFILES.md`.
-- **Analiză:** pentru actualizări continue, folosește `go infinite`.

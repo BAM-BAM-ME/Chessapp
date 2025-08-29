@@ -1,48 +1,56 @@
 # ChessApp for Windows with Stockfish 17.1
 
-Aplicatie Windows (.NET 8 WPF) care ruleaza Stockfish 17.1 ca engine extern prin UCI. Include tabla 2D, joc om vs computer, analiza de baza, profiluri si configurare in JSON. Proiectul este pregatit pentru extindere cu Insights si invatare locala.
+Windows app (.NET 8 WPF) that runs Stockfish 17.1 as an external UCI engine. It includes a 2D board, human vs. computer play, basic analysis, profiles, and JSON-based configuration. The project is prepared for future extensions (Insights, local learning).
 
-## Cerinte
-- Windows 10 sau 11 x64
-- .NET 8 Desktop Runtime
-- Executabilul motorului in `Engines/stockfish.exe`
+## Requirements
 
-## Instalare rapida
-1. Copiaza `stockfish.exe` in folderul `Engines`.
-2. Deschide `ChessApp.sln` in Visual Studio 2022 si ruleaza proiectul `Gui`.
-3. Daca vrei sa schimbi calea engine-ului, editeaza `Data/appsettings.json` sau foloseste butonul Engine din UI.
+* Windows 10 or 11 x64
+* .NET 8 Desktop Runtime
+* Engine executable at `Engines/stockfish.exe`
 
-## Control joc
-- Start game trimite `position startpos` si `go movetime 1000`.
-- Analyze porneste `go infinite`, Stop trimite `stop`.
-- Tabla se actualizeaza la fiecare mutare.
+## Quick Start
 
-## Fisiere cheie
-- `Interop/EngineHost.cs` porneste si comunica cu `stockfish.exe` prin UCI.
-- `Interop/UciParser.cs` parseaza liniile `info` pentru viitorul panou de analiza.
-- `Core/GameController.cs` aplica mutarile UCI si mentine FEN pentru randare.
-- `Gui/Controls/BoardControl.cs` randare 2D cu piese Unicode.
-- `Data/appsettings.json` setari de baza. `Data/profiles.json` contine 20 de profiluri.
-- `Engines/README.txt` explicatii pentru motor.
+1. Copy `stockfish.exe` into the `Engines` folder.
+2. Open `ChessApp.sln` in Visual Studio 2022 and run the `Gui` project.
+3. To change the engine path, edit `Data/appsettings.json` or use the Engine button in the UI.
+
+## Gameplay
+
+* **Start game** sends `position startpos` then `go movetime 1000`.
+* **Analyze** starts `go infinite`; **Stop** sends `stop`.
+* The board updates after each move.
+
+## Key files
+
+* `Interop/EngineHost.cs` — spawns and talks to `stockfish.exe` via UCI.
+* `Interop/UciParser.cs` — parses `info` lines used by the analysis panel.
+* `Core/GameController.cs` — applies UCI moves and maintains FEN for rendering.
+* `Gui/Controls/BoardControl.cs` — 2D rendering with Unicode pieces.
+* `Data/appsettings.json` — base settings. `Data/profiles.json` contains profile presets.
+* `Engines/README.txt` — engine notes.
 
 ## Blueprint
-Planul detaliat pentru evoluția aplicației, incluzând engine propriu, NNUE, optimizări Windows și GUI avansat, este descris în `docs/BLUEPRINT.md`.
 
-## Licenta si Stockfish
-Daca distribui motorul impreuna cu pachetul tau, include licenta si autorii Stockfish. Cea mai simpla varianta este sa livrezi doar GUI-ul si sa soliciti calea catre executabil la primul start.
+The detailed plan for the app evolution (engine, NNUE, Windows optimizations, advanced GUI) is described in `docs/BLUEPRINT.md`.
+
+## License and Stockfish
+
+If you distribute the engine together with your package, include Stockfish license & authors. The simplest option is to ship only the GUI and request the engine path on first launch.
 
 ## Packaging
-The repository includes an experimental Windows Application Packaging Project.
-It is not signed and is intended for local testing.
+
+The repository includes an experimental Windows Application Packaging Project. It is **not signed** and is intended for local testing only.
 
 ### Local build
+
 1. Enable **Developer Mode** or allow sideloading on your Windows machine.
-2. Open a Developer PowerShell and run `Scripts\build-msix.ps1`.
-   The script restores the solution, builds the WPF project and places an unsigned `.msix` in `packaging\Artifacts`.
+2. Open a **Developer PowerShell** and run `Scripts\build-msix.ps1`.
+   The script restores the solution, builds the WPF project, and places an unsigned `.msix` in `packaging\Artifacts`.
    Placeholder logos are generated automatically during this step.
 3. Install the package by launching the generated `.msix`. Windows will warn about the unsigned package.
 
 ### Troubleshooting
-- The script expects `msbuild` from Visual Studio to be available in `PATH`.
-- Make sure Developer Mode is enabled; otherwise Windows will refuse to install the package.
-- Code signing and Store submission are planned for later tasks.
+
+* The script expects **`msbuild`** from Visual Studio to be available in `PATH`.
+* Make sure Developer Mode is enabled; otherwise Windows will refuse to install the package.
+* Code signing and Store submission will be added in later tasks.

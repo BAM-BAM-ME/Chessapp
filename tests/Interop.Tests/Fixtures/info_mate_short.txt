@@ -1,0 +1,3 @@
+info depth 12 score mate 3 pv e7e8q
+info depth 8 score mate 1 pv g2g1q
+info depth 10 score mate -2 pv a7a8q

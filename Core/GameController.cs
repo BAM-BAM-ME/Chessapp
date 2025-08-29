@@ -18,14 +18,11 @@ public class GameController
 
     // Very small move list so the GUI can build a UCI "position" command.
     private readonly List<string> _moves = new();
-
-/add-method-to-apply-engine-move
     /// <summary>Raised whenever an engine move is applied.</summary>
     public event Action<string>? EngineMoveApplied;
 
     public GameController(ILogger<GameController>? logger = null)
         => _logger = logger ?? Logging.Factory.CreateLogger<GameController>();
- main
 
     /// <summary>Resets to the initial chess position.</summary>
     public void NewGame()
@@ -71,24 +68,27 @@ public class GameController
         => TryApplyUserMove(BuildUci(from, to, promotion));
 
     /// <summary>
-    /// Applies an engine move in UCI form. Uses the same validation as user
-    /// moves and updates the internal move list. Raises <see
-    /// cref="EngineMoveApplied"/> when successful.
+    /// Attempts to apply an engine move in UCI form. Uses the same validation as
+    /// user moves and updates the internal move list. Raises
+    /// <see cref="EngineMoveApplied"/> when successful. Returns true when the
+    /// move is accepted.
     /// </summary>
-    public void ApplyEngineMove(string uci)
+    public bool TryApplyEngineMove(string uci)
     {
         if (TryApplyUserMove(uci))
         {
             EngineMoveApplied?.Invoke(uci.Trim());
+            return true;
         }
+        return false;
     }
 
     /// <summary>
     /// Overload for engine move using separate components (from, to,
     /// promotion).
     /// </summary>
-    public void ApplyEngineMove(object from, object to, object? promotion = null)
-        => ApplyEngineMove(BuildUci(from, to, promotion));
+    public bool TryApplyEngineMove(object from, object to, object? promotion = null)
+        => TryApplyEngineMove(BuildUci(from, to, promotion));
 
     // Helpers
     private static string BuildUci(object from, object to, object? promotion)

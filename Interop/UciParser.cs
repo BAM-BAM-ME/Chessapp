@@ -12,6 +12,7 @@ namespace Interop
         public int Nps { get; set; }
         public int TbHits { get; set; }
         public string Pv { get; set; } = string.Empty;
+        public string RootMove { get; set; } = string.Empty;
         public int MultiPv { get; set; } = 1;
         public int TimeMs { get; set; }
     }
@@ -41,6 +42,8 @@ namespace Interop
                 else if (t == "pv")
                 {
                     upd.Pv = string.Join(' ', parts, i+1, parts.Length - (i+1));
+                    var mvParts = upd.Pv.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (mvParts.Length > 0) upd.RootMove = mvParts[0];
                     break;
                 }
             }

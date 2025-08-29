@@ -17,7 +17,7 @@
 ### Particularități Windows
 - Antivirusul blochează pornirea motorului → adaugă calea motorului în allowlist.
 - MSIX nu poate porni motorul → rulează installerul o dată ca Administrator; verifică politicile „App Installer”.
-- Căi cu spații → citează întotdeauna `engine.path` / `EnginePath`.
+- Căi cu spații → citează întotdeauna `EnginePath`.
 
 ### Capturarea unui log UCI
 Activează o opțiune de logging UCI (dacă este suportată) **sau** rulează motorul printr-un wrapper ce redirecționează stdout în `Logs/uci-YYYYMMDD.txt`. Atașează acest log când deschizi un bug.

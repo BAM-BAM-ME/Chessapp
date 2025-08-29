@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Core;
+using Chessapp.Core;
 
 namespace Gui
 {

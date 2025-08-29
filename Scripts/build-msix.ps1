@@ -2,15 +2,14 @@ param(
     [string]$Configuration = "Release"
 )
 
-$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = "Stop"
+$root = Split-Path -Parent $PSScriptRoot
+$solution = Join-Path $root "ChessApp.sln"
+$packProj = Join-Path $root "packaging\Chessapp.Package\Chessapp.Package.wapproj"
+$artifactDir = Join-Path $root "packaging\Artifacts"
+ $assetsDir = Join-Path $root "packaging\Chessapp.Package\Assets"
 
-$root        = Split-Path -Parent $PSScriptRoot
-$solution    = Join-Path $root 'ChessApp.sln'
-$packProj    = Join-Path $root 'packaging\Chessapp.Package\Chessapp.Package.wapproj'
-$artifactDir = Join-Path $root 'packaging\Artifacts'
-$assetsDir   = Join-Path $root 'packaging\Chessapp.Package\Assets'
-
-# Ensure placeholder logo assets exist (avoid committing binaries)
+ # Ensure placeholder assets exist (generated at build time to avoid binary files in repo)
 if (!(Test-Path $assetsDir)) {
     New-Item -ItemType Directory -Path $assetsDir | Out-Null
 }
@@ -25,9 +24,9 @@ function New-Logo($path, $size) {
     $bmp.Dispose()
 }
 
-$logos = @{
-    'Square150x150Logo.png' = 150
-    'Square44x44Logo.png'   = 44
+$logos = @{ 
+    'Square150x150Logo.png' = 150;
+    'Square44x44Logo.png'   = 44;
     'StoreLogo.png'         = 50
 }
 
@@ -42,22 +41,18 @@ if (!(Test-Path $artifactDir)) {
     New-Item -ItemType Directory -Path $artifactDir | Out-Null
 }
 
-Write-Host 'Restoring solution...'
+Write-Host "Restoring solution..."
 msbuild $solution -t:Restore | Out-Null
 
-Write-Host 'Building WPF project...'
+Write-Host "Building WPF project..."
 msbuild $solution -p:Configuration=$Configuration | Out-Null
 
-Write-Host 'Building MSIX package...'
-msbuild $packProj `
-    -p:Configuration=$Configuration `
-    -p:AppxBundle=Never `
-    -p:AppxPackageSigningEnabled=false `
-    -p:AppxPackageDir="$artifactDir\" | Out-Null
+Write-Host "Building MSIX package..."
+msbuild $packProj -p:Configuration=$Configuration -p:AppxBundle=Never -p:AppxPackageSigningEnabled=false -p:AppxPackageDir="$artifactDir\" | Out-Null
 
 $package = Get-ChildItem $artifactDir -Filter *.msix -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($package) {
     Write-Host "Package created at: $($package.FullName)"
 } else {
-    Write-Warning 'No package produced. Check build output.'
+    Write-Warning "No package produced. Check build output."
 }

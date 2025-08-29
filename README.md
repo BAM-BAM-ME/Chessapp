@@ -1,39 +1,56 @@
-# ChessApp
+# ChessApp for Windows with Stockfish 17.1
 
-ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such as Stockfish 17.1. It currently offers a 2D board, human vs. computer play, basic analysis, JSON configuration and profiles, and is structured for future insights and learning features.
+Windows app (.NET 8 WPF) that runs Stockfish 17.1 as an external UCI engine. It includes a 2D board, human vs. computer play, basic analysis, profiles, and JSON-based configuration. The project is prepared for future extensions (Insights, local learning).
+
+## Requirements
+
+* Windows 10 or 11 x64
+* .NET 8 Desktop Runtime
+* Engine executable at `Engines/stockfish.exe`
 
 ## Quick Start
 
-**Prerequisites:** Windows 10/11 x64, [.NET 8 SDK](https://dotnet.microsoft.com/), optional [`stockfish.exe`](https://stockfishchess.org/).
+1. Copy `stockfish.exe` into the `Engines` folder.
+2. Open `ChessApp.sln` in Visual Studio 2022 and run the `Gui` project.
+3. To change the engine path, edit `Data/appsettings.json` or use the Engine button in the UI.
 
-1. Optionally place the engine at `Engines/stockfish.exe` **or** edit `Data/appsettings.json` to set `AppSettings.EnginePath`.
-2. Build the GUI:
+## Gameplay
 
-   ```bash
-   dotnet build
-   # or open ChessApp.sln in Visual Studio 2022 and run the Gui project
-   ```
-3. Run:
+* **Start game** sends `position startpos` then `go movetime 1000`.
+* **Analyze** starts `go infinite`; **Stop** sends `stop`.
+* The board updates after each move.
 
-   ```bash
-   dotnet run --project Gui
-   ```
+## Key files
 
-The engine path is configured via `AppSettings.EnginePath`.
-
-See [BUILD.md](docs/BUILD.md) for detailed instructions and [PROFILES.md](docs/PROFILES.md) for profile definitions.
-
-## Key Files
-
-- `Interop/EngineHost.cs` – starts and communicates with the engine via UCI.
-- `Core/GameController.cs` – applies UCI moves and maintains FEN.
-- `Data/appsettings.json` – base settings. `Data/profiles.json` – sample profiles.
+* `Interop/EngineHost.cs` — spawns and talks to `stockfish.exe` via UCI.
+* `Interop/UciParser.cs` — parses `info` lines used by the analysis panel.
+* `Core/GameController.cs` — applies UCI moves and maintains FEN for rendering.
+* `Gui/Controls/BoardControl.cs` — 2D rendering with Unicode pieces.
+* `Data/appsettings.json` — base settings. `Data/profiles.json` contains profile presets.
+* `Engines/README.txt` — engine notes.
 
 ## Blueprint
 
-The roadmap and architecture plan live in [BLUEPRINT.md](docs/BLUEPRINT.md).
+The detailed plan for the app evolution (engine, NNUE, Windows optimizations, advanced GUI) is described in `docs/BLUEPRINT.md`.
 
 ## License and Stockfish
 
-If you ship the engine with the app, include the Stockfish `LICENSE` and `AUTHORS`. A simple approach is to distribute only the GUI and ask the user for the engine path on first launch.
+If you distribute the engine together with your package, include Stockfish license & authors. The simplest option is to ship only the GUI and request the engine path on first launch.
 
+## Packaging
+
+The repository includes an experimental Windows Application Packaging Project. It is **not signed** and is intended for local testing only.
+
+### Local build
+
+1. Enable **Developer Mode** or allow sideloading on your Windows machine.
+2. Open a **Developer PowerShell** and run `Scripts\build-msix.ps1`.
+   The script restores the solution, builds the WPF project, and places an unsigned `.msix` in `packaging\Artifacts`.
+   Placeholder logos are generated automatically during this step.
+3. Install the package by launching the generated `.msix`. Windows will warn about the unsigned package.
+
+### Troubleshooting
+
+* The script expects **`msbuild`** from Visual Studio to be available in `PATH`.
+* Make sure Developer Mode is enabled; otherwise Windows will refuse to install the package.
+* Code signing and Store submission will be added in later tasks.

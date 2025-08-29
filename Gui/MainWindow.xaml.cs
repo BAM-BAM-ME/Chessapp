@@ -3,30 +3,26 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-/add-engine-selection-modal-to-settings-ui
-
-using System.ComponentModel;
-using System.Text;
-using Microsoft.Win32;
-main
-using Chessapp.Core;
-using Chessapp.Interop;
+using System.Windows.Threading;
+using Core;
+using Interop;
 
 namespace Gui
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private readonly GameController _game = new GameController();
-        private readonly EngineHost _engine = new EngineHost();
-        private InsightsService _insights = new InsightsService();
-        private readonly System.Windows.Threading.DispatcherTimer _insightsTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        private readonly GameController _game = new();
+        private readonly EngineHost _engine = new();
+        private InsightsService _insights = new();
+        private readonly DispatcherTimer _insightsTimer = new() { Interval = TimeSpan.FromSeconds(3) };
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
- codex/bind-analysis-summary-to-board-header
         private string _analysisHeader = "Engine idle";
+        private readonly StringBuilder _engineLog = new();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -38,27 +34,23 @@ namespace Gui
                 if (_analysisHeader == value) return;
                 _analysisHeader = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisHeader)));
-
-        private readonly StringBuilder _engineLog = new StringBuilder();
-
-        public event PropertyChangedEventHandler? PropertyChanged;
+            }
+        }
 
         public string EngineLog => _engineLog.ToString();
-
-        private void AppendEngineLog(string line)
-        {
-            _engineLog.AppendLine(line);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EngineLog)));
- main
-        }
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
+
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
-            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => { AppendEngineLog($"bestmove {move}"); await OnBestMove(move); });
+            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () =>
+            {
+                AppendEngineLog($"bestmove {move}");
+                await OnBestMove(move);
+            });
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
             _insightsTimer.Tick += async (_, __) =>
             {
@@ -66,7 +58,14 @@ namespace Gui
                     await InsightsPanel.RefreshAsync();
             };
             _insightsTimer.Start();
+
             LoadSettings();
+        }
+
+        private void AppendEngineLog(string line)
+        {
+            _engineLog.AppendLine(line);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EngineLog)));
         }
 
         private void LoadSettings()
@@ -74,7 +73,8 @@ namespace Gui
             try
             {
                 var config = ConfigService.LoadAppSettings();
-                if (!string.IsNullOrWhiteSpace(config.EnginePath)) _enginePath = config.EnginePath;
+                if (!string.IsNullOrWhiteSpace(config.EnginePath))
+                    _enginePath = config.EnginePath;
                 _insightsEnabled = config.Insights;
                 _insights = new InsightsService(config.InsightsDb);
                 InsightsPanel.Service = _insights;
@@ -88,7 +88,6 @@ namespace Gui
             TxtInfo.ScrollToEnd();
 
             var upd = UciParser.TryParseInfo(line);
-codex/bind-analysis-summary-to-board-header
             if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
             {
                 var moves = upd.Pv.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(4);
@@ -97,12 +96,11 @@ codex/bind-analysis-summary-to-board-header
                     ? $"M{upd.ScoreCp}"
                     : (upd.ScoreCp / 100.0).ToString("0.00", CultureInfo.InvariantCulture);
                 AnalysisHeader = $"{upd.Depth} | {eval} | {pv}";
-
+            }
             if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv))
             {
                 var score = upd.ScoreMate ? $"mate {upd.ScoreCp}" : $"cp {upd.ScoreCp}";
                 AppendEngineLog($"d{upd.Depth} {score} {upd.Pv}");
- main
                 if (_insightsEnabled)
                 {
                     int? cp = upd.ScoreMate ? null : upd.ScoreCp;
@@ -193,15 +191,9 @@ codex/bind-analysis-summary-to-board-header
             await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
             var cfg = ConfigService.LoadAppSettings();
-/add-engine-selection-modal-to-settings-ui
             await _engine.SendAsync(_game.ToUciPositionCommand());
             await _engine.SendAsync("setoption name MultiPV value 3");
             await _engine.SendAsync($"go depth {cfg.Depth}");
-
-            await SendCommandAsync(_game.ToUciPositionCommand());
-            await SendCommandAsync("setoption name MultiPV value 3");
-            await SendCommandAsync("go infinite");
- main
         }
 
         private async void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -226,3 +218,4 @@ codex/bind-analysis-summary-to-board-header
         }
     }
 }
+

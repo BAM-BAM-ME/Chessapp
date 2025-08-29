@@ -8,6 +8,7 @@ namespace Core
     public class AppSettings
     {
         public string EnginePath { get; set; } = "Engines/stockfish.exe";
+        public int Depth { get; set; } = 20;
         public int Threads { get; set; } = Environment.ProcessorCount - 1 > 0 ? Environment.ProcessorCount - 1 : 1;
         public int Hash { get; set; } = 1024;
         public bool Ponder { get; set; } = true;

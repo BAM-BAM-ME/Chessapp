@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Win32;
 using Chessapp.Core;
 using Chessapp.Interop;
 
@@ -141,7 +140,7 @@ namespace Gui
             await _engine.ApplyCommonOptionsAsync(cfg);
             await _engine.SendAsync(_game.ToUciPositionCommand());
             await _engine.SendAsync("setoption name MultiPV value 3");
-            await _engine.SendAsync("go infinite");
+            await _engine.SendAsync($"go depth {cfg.Depth}");
         }
 
         private async void BtnStop_Click(object sender, RoutedEventArgs e)
@@ -153,15 +152,13 @@ namespace Gui
             _analyzing = false;
         }
 
-        private void BtnLoadEngine_Click(object sender, RoutedEventArgs e)
+        private void BtnSettings_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new OpenFileDialog { Filter = "Engine (*.exe)|*.exe" };
-            if (ofd.ShowDialog() == true)
+            var dlg = new SettingsWindow();
+            if (dlg.ShowDialog() == true)
             {
-                _enginePath = ofd.FileName;
                 var cfg = ConfigService.LoadAppSettings();
-                cfg.EnginePath = _enginePath;
-                ConfigService.SaveAppSettings(cfg);
+                _enginePath = cfg.EnginePath;
                 AppendInfo($"Engine set: {_enginePath}");
             }
         }

@@ -37,7 +37,7 @@ It is not signed and is intended for local testing.
 
 ### Local build
 1. Enable **Developer Mode** or allow sideloading on your Windows machine.
-2. Open a Developer PowerShell and run `scripts\build-msix.ps1`.
+2. Open a Developer PowerShell and run `Scripts\build-msix.ps1`.
    The script restores the solution, builds the WPF project and places an unsigned `.msix` in `packaging\Artifacts`.
    Placeholder logos are generated automatically during this step.
 3. Install the package by launching the generated `.msix`. Windows will warn about the unsigned package.

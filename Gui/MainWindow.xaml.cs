@@ -170,7 +170,7 @@ namespace Gui
         private async Task OnBestMove(string bestmove)
         {
             if (_analyzing) return;
-            if (_game.ApplyEngineMove(bestmove))
+            if (_game.TryApplyEngineMove(bestmove))
             {
                 Board.SetPosition(_game.Fen);
             }

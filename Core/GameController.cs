@@ -68,12 +68,12 @@ public class GameController
         => TryApplyUserMove(BuildUci(from, to, promotion));
 
     /// <summary>
-    /// Applies an engine move in UCI form. Uses the same validation as user
-    /// moves and updates the internal move list. Raises <see
-    /// cref="EngineMoveApplied"/> when successful. Returns true when the move
-    /// is accepted.
+    /// Attempts to apply an engine move in UCI form. Uses the same validation as
+    /// user moves and updates the internal move list. Raises
+    /// <see cref="EngineMoveApplied"/> when successful. Returns true when the
+    /// move is accepted.
     /// </summary>
-    public bool ApplyEngineMove(string uci)
+    public bool TryApplyEngineMove(string uci)
     {
         if (TryApplyUserMove(uci))
         {
@@ -87,8 +87,8 @@ public class GameController
     /// Overload for engine move using separate components (from, to,
     /// promotion).
     /// </summary>
-    public bool ApplyEngineMove(object from, object to, object? promotion = null)
-        => ApplyEngineMove(BuildUci(from, to, promotion));
+    public bool TryApplyEngineMove(object from, object to, object? promotion = null)
+        => TryApplyEngineMove(BuildUci(from, to, promotion));
 
     // Helpers
     private static string BuildUci(object from, object to, object? promotion)

@@ -30,4 +30,24 @@ public class GameControllerTests
         gc.TryApplyUserMove("c7c5");
         Assert.Equal("position startpos moves e2e4 c7c5", gc.ToUciPositionCommand());
     }
+
+    [Fact]
+    public void ApplyEngineMove_Should_RecordMove()
+    {
+        var gc = new GameController();
+        gc.NewGame();
+        gc.ApplyEngineMove("g8f6");
+        Assert.Equal("position startpos moves g8f6", gc.ToUciPositionCommand());
+    }
+
+    [Fact]
+    public void ApplyEngineMove_Should_RaiseEvent()
+    {
+        var gc = new GameController();
+        gc.NewGame();
+        string? notified = null;
+        gc.EngineMoveApplied += m => notified = m;
+        gc.ApplyEngineMove("g8f6");
+        Assert.Equal("g8f6", notified);
+    }
 }

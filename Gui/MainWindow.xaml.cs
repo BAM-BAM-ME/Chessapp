@@ -79,7 +79,10 @@ namespace Gui
                 _insights = new InsightsService(config.InsightsDb);
                 InsightsPanel.Service = _insights;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void AppendInfo(string line)

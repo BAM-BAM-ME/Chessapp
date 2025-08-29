@@ -1,0 +1,2 @@
+Acest proiect poate utiliza motorul Stockfish (GPLv3) ca proces separat.
+Daca distribui engine-ul in pachetul aplicatiei, include LICENSE si AUTHORS din distributia Stockfish.

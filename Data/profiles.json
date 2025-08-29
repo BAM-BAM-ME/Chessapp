@@ -1,0 +1,369 @@
+[
+  {
+    "name": "Titan Max",
+    "uci": {
+      "Threads": 8,
+      "Hash": 2048,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/titan.bin",
+      "allow": [
+        "C60..C99",
+        "D30..D69"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Titan Anti-Draw",
+    "uci": {
+      "Threads": 8,
+      "Hash": 2048,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/anti_draw.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Aggressive A",
+    "uci": {
+      "Threads": 8,
+      "Hash": 2048,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/aggr_a.bin",
+      "allow": [
+        "B20..B99",
+        "E60..E99"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Aggressive B",
+    "uci": {
+      "Threads": 8,
+      "Hash": 2048,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/aggr_b.bin",
+      "allow": [
+        "C30..C39",
+        "B90..B99"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Positional A",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/pos_a.bin",
+      "allow": [
+        "C60..C99",
+        "D02..D69"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Positional B",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/pos_b.bin",
+      "allow": [
+        "C00..C99",
+        "E00..E99"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Anti-1.e4",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/anti_e4.bin",
+      "allow": [
+        "C00..C99",
+        "B00..B19"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Anti-1.d4",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/anti_d4.bin",
+      "allow": [
+        "D00..D99",
+        "E60..E99"
+      ]
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Theory-Cutter",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/secondaries.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Endgame-First",
+    "uci": {
+      "Threads": 8,
+      "Hash": 2048,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/endgame.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Rapid-Practical",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/rapid.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Blitz-Safe",
+    "uci": {
+      "Threads": 8,
+      "Hash": 512,
+      "Ponder": false,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/blitz.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Bullet-Reflex",
+    "uci": {
+      "Threads": 8,
+      "Hash": 256,
+      "Ponder": false,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/bullet.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Prep-White",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/prep_white.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Prep-Black",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/prep_black.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Human-Elo 1600",
+    "uci": {
+      "Threads": 4,
+      "Hash": 256,
+      "Ponder": false,
+      "MultiPV": 1,
+      "UCI_LimitStrength": true,
+      "UCI_Elo": 1600
+    },
+    "book": {
+      "path": "Books/friendly.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Human-Elo 2000",
+    "uci": {
+      "Threads": 4,
+      "Hash": 512,
+      "Ponder": false,
+      "MultiPV": 1,
+      "UCI_LimitStrength": true,
+      "UCI_Elo": 2000
+    },
+    "book": {
+      "path": "Books/friendly.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Human-Elo 2400",
+    "uci": {
+      "Threads": 6,
+      "Hash": 768,
+      "Ponder": true,
+      "MultiPV": 1,
+      "UCI_LimitStrength": true,
+      "UCI_Elo": 2400
+    },
+    "book": {
+      "path": "Books/friendly.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Analysis-Deep",
+    "uci": {
+      "Threads": 8,
+      "Hash": 2048,
+      "Ponder": true,
+      "MultiPV": 5
+    },
+    "book": {
+      "path": "Books/analysis.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  },
+  {
+    "name": "Hardware-Auto",
+    "uci": {
+      "Threads": 8,
+      "Hash": 1024,
+      "Ponder": true,
+      "MultiPV": 1
+    },
+    "book": {
+      "path": "Books/default.bin",
+      "allow": []
+    },
+    "move_policy": {
+      "deterministic": true,
+      "top_k": 1
+    }
+  }
+]

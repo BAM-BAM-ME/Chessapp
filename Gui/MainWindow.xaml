@@ -1,0 +1,28 @@
+<Window x:Class="Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Gui.Controls"
+        Title="ChessApp - Stockfish 17.1" Height="720" Width="1024">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="280"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <StackPanel Margin="8" Grid.Column="0">
+      <TextBlock Text="Engine control" FontWeight="Bold" Margin="0,0,0,8"/>
+      <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+        <Button Name="BtnStart" Content="Start game" Width="120" Margin="0,0,8,0" Click="BtnStart_Click"/>
+        <Button Name="BtnAnalyze" Content="Analyze" Width="120" Click="BtnAnalyze_Click"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+        <Button Name="BtnStop" Content="Stop" Width="120" Margin="0,0,8,0" Click="BtnStop_Click"/>
+        <Button Name="BtnLoadEngine" Content="Engine..." Width="120" Click="BtnLoadEngine_Click"/>
+      </StackPanel>
+      <TextBlock Text="Info" FontWeight="Bold" Margin="0,8,0,4"/>
+      <TextBox Name="TxtInfo" Height="420" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+    </StackPanel>
+
+    <controls:BoardControl x:Name="Board" Grid.Column="1" Margin="8"/>
+  </Grid>
+</Window>

@@ -54,7 +54,10 @@ namespace Core
                     return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to load app settings: {ex}");
+            }
             return new AppSettings();
         }
 

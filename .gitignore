@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+**/*.user
+**/*.suo
+**/*.cache
+**/*.ide
+**/*.userprefs
+/Engines/stockfish.exe
+/Engines/*.zip
+/Engines/*.exe

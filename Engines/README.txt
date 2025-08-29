@@ -1,1 +1,1 @@
-Plaseaza aici executabilul motorului redenumit exact: stockfish.exe
+Place the engine executable here with the exact name: stockfish.exe

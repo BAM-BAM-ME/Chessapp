@@ -1,20 +1,3 @@
-# File Path
-
-`Gui/Gui.csproj`
-
-# Source of Truth
-
-Chessapp repo — WPF GUI project.
-
-# Why Replace
-
-SDK 9+ warns that `Microsoft.NET.Sdk.WindowsDesktop` is no longer required. Switching to `Microsoft.NET.Sdk` while keeping `<UseWPF>true</UseWPF>` removes the warning without changing behavior.
-
----
-
-## Replacement (full file content)
-
-```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -28,15 +11,3 @@ SDK 9+ warns that `Microsoft.NET.Sdk.WindowsDesktop` is no longer required. Swit
     <ProjectReference Include="..\Interop\Interop.csproj" />
   </ItemGroup>
 </Project>
-```
-
----
-
-## Validation steps
-
-1. Save, commit, and push.
-2. CI build should no longer emit the `NETSDK1137` warning for the GUI project.
-
-## Notes
-
-No functional change; this is a tooling hygiene update driven by the SDK recommendation.

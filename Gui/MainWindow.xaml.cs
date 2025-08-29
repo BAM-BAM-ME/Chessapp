@@ -23,7 +23,7 @@ namespace Gui
             InitializeComponent();
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
-            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
+            _engine.BestMoveReceived += move => Dispatcher.Invoke(() => OnBestMove(move));
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
             _insightsTimer.Tick += async (_, __) =>
             {
@@ -90,7 +90,7 @@ namespace Gui
                     AppendInfo("Engine not found. Set the path with the Engine button.");
                     throw new FileNotFoundException("stockfish.exe missing");
                 }
-                _engine.Start(_enginePath);
+                await Task.Run(() => _engine.Start(_enginePath)); // avoid blocking UI thread
             }
         }
 
@@ -116,7 +116,7 @@ namespace Gui
             }
         }
 
-        private async Task OnBestMove(string bestmove)
+        private void OnBestMove(string bestmove)
         {
             if (_analyzing) return;
             if (_game.ApplyEngineMove(bestmove))

@@ -56,7 +56,7 @@ namespace Core
             }
             catch (Exception ex)
             {
-                try { Console.Error.WriteLine($"Failed to load app settings: {ex.Message}"); } catch { }
+                Console.Error.WriteLine($"Failed to load app settings: {ex}");
             }
             return new AppSettings();
         }

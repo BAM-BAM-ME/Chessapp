@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "profile.schema.json",
+  "title": "Profile",
+  "type": "object",
+  "required": ["name", "uci", "move_policy", "book"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string" },
+    "uci": {
+      "type": "object",
+      "additionalProperties": { "type": ["string", "number", "boolean"] }
+    },
+    "move_policy": {
+      "type": "object",
+      "required": ["deterministic", "top_k"],
+      "additionalProperties": false,
+      "properties": {
+        "deterministic": { "type": "boolean" },
+        "top_k": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "book": {
+      "type": "object",
+      "required": ["allow"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated; will be removed when engine book loading is implemented."
+        },
+        "allow": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-E][0-9]{2}(\\.\\.[A-E][0-9]{2})?$"
+          }
+        }
+      }
+    }
+  }
+}

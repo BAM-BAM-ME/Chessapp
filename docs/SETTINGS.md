@@ -1,20 +1,18 @@
 # SETTINGS
 
-Documentează cheile din `Data/appsettings.json`.
+Documents the keys in `Data/appsettings.json`.
 
-## Chei & valori implicite
-- `EnginePath`: `string` — implicit: `Engines/stockfish.exe`
-- `Threads`: `int` — implicit: `8`
-- `Hash`: `int` — implicit: `1024` (MB)
-- `Ponder`: `bool` — implicit: `true`
-- `MultiPV`: `int` — implicit: `1`
-- `SyzygyPath`: `string` — implicit: `""`
-- `ProfilesPath`: `string` — implicit: `Data/profiles.json`
-- `LearnDb`: `string` — implicit: `Data/learn.db`
+## Keys & defaults
+- `EnginePath`: `string` — default `Engines/stockfish.exe`
+- `Threads`: `int` — default `8`
+- `Hash`: `int` — default `1024` (MB)
+- `Ponder`: `bool` — default `true`
+- `MultiPV`: `int` — default `1`
+- `SyzygyPath`: `string` — default `""`
+- `ProfilesPath`: `string` — default `Data/profiles.json`
+- `LearnDb`: `string` — default `Data/learn.db`
 
-> Alias pentru scripturi: `engine.path` (echivalent cu `EnginePath`). Păstrează-le sincron.
-
-## Exemplu extins
+## Extended example
 ```json
 {
   "EnginePath": "Engines/stockfish.exe",
@@ -28,7 +26,7 @@ Documentează cheile din `Data/appsettings.json`.
 }
 ```
 
-## Validare & erori
-- `EnginePath` trebuie să indice un executabil existent; dacă lipsește, cere utilizatorului calea sau folosește fallback `Engines/stockfish.exe`.
-- `Threads` ≥ 1; `Hash` în MB; `MultiPV` ≥ 1.
-- Dacă `SyzygyPath` este setat dar motorul nu are suport TB, ignoră grațios.
+## Validation & errors
+- `EnginePath` must point to an existing executable; if missing, prompt the user or fall back to `Engines/stockfish.exe`.
+- `Threads` ≥ 1; `Hash` in MB; `MultiPV` ≥ 1.
+- If `SyzygyPath` is set but the engine lacks tablebase support, ignore gracefully.

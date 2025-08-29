@@ -29,15 +29,12 @@ namespace Interop
         public event Action<string>? BestMoveReceived;
         public event Action<Exception>? EngineCrashed;
 
-codex/add-simple-logging-with-microsoft.extensions.logging
         public EngineHost(ILogger<EngineHost>? logger = null)
         {
             _logger = logger ?? Logging.Factory.CreateLogger<EngineHost>();
         }
 
-
         /// <summary>Starts the engine process.</summary>
-main
         public void Start(string enginePath)
         {
             _logger.LogInformation("Starting engine: {Path}", enginePath);
@@ -211,4 +208,3 @@ main
         }
     }
 }
-

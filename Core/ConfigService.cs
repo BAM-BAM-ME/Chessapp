@@ -15,6 +15,8 @@ namespace Core
         public string SyzygyPath { get; set; } = "";
         public string ProfilesPath { get; set; } = "Data/profiles.json";
         public string LearnDb { get; set; } = "Data/learn.db";
+        public bool Insights { get; set; } = true;
+        public string InsightsDb { get; set; } = "Data/insights.db";
     }
 
     public class Profile

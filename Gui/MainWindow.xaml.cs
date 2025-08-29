@@ -12,6 +12,9 @@ namespace Gui
     {
         private readonly GameController _game = new GameController();
         private readonly EngineHost _engine = new EngineHost();
+        private InsightsService _insights = new InsightsService();
+        private readonly System.Windows.Threading.DispatcherTimer _insightsTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
 
@@ -22,15 +25,24 @@ namespace Gui
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
             _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
-            LoadEnginePathFromSettings();
+            _insightsTimer.Tick += async (_, __) =>
+            {
+                if (_engine.IsRunning && _insightsEnabled)
+                    await InsightsPanel.RefreshAsync();
+            };
+            _insightsTimer.Start();
+            LoadSettings();
         }
 
-        private void LoadEnginePathFromSettings()
+        private void LoadSettings()
         {
             try
             {
                 var config = ConfigService.LoadAppSettings();
                 if (!string.IsNullOrWhiteSpace(config.EnginePath)) _enginePath = config.EnginePath;
+                _insightsEnabled = config.Insights;
+                _insights = new InsightsService(config.InsightsDb);
+                InsightsPanel.Service = _insights;
             }
             catch { }
         }
@@ -39,6 +51,17 @@ namespace Gui
         {
             TxtInfo.AppendText(line + Environment.NewLine);
             TxtInfo.ScrollToEnd();
+
+            if (_insightsEnabled)
+            {
+                var upd = UciParser.TryParseInfo(line);
+                if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+                {
+                    int? cp = upd.ScoreMate ? null : upd.ScoreCp;
+                    int? mate = upd.ScoreMate ? upd.ScoreCp : null;
+                    _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
+                }
+            }
         }
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)

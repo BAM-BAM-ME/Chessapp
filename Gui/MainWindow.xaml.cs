@@ -3,16 +3,11 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-/add-engine-selection-modal-to-settings-ui
-
-using System.ComponentModel;
-using System.Text;
-using Microsoft.Win32;
-main
-using Chessapp.Core;
-using Chessapp.Interop;
+using Core;
+using Interop;
 
 namespace Gui
 {
@@ -25,7 +20,6 @@ namespace Gui
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
- codex/bind-analysis-summary-to-board-header
         private string _analysisHeader = "Engine idle";
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -38,10 +32,10 @@ namespace Gui
                 if (_analysisHeader == value) return;
                 _analysisHeader = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AnalysisHeader)));
+            }
+        }
 
         private readonly StringBuilder _engineLog = new StringBuilder();
-
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         public string EngineLog => _engineLog.ToString();
 
@@ -49,7 +43,6 @@ namespace Gui
         {
             _engineLog.AppendLine(line);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EngineLog)));
- main
         }
 
         public MainWindow()
@@ -88,7 +81,6 @@ namespace Gui
             TxtInfo.ScrollToEnd();
 
             var upd = UciParser.TryParseInfo(line);
-codex/bind-analysis-summary-to-board-header
             if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
             {
                 var moves = upd.Pv.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(4);
@@ -97,12 +89,13 @@ codex/bind-analysis-summary-to-board-header
                     ? $"M{upd.ScoreCp}"
                     : (upd.ScoreCp / 100.0).ToString("0.00", CultureInfo.InvariantCulture);
                 AnalysisHeader = $"{upd.Depth} | {eval} | {pv}";
+            }
 
             if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv))
             {
                 var score = upd.ScoreMate ? $"mate {upd.ScoreCp}" : $"cp {upd.ScoreCp}";
                 AppendEngineLog($"d{upd.Depth} {score} {upd.Pv}");
- main
+
                 if (_insightsEnabled)
                 {
                     int? cp = upd.ScoreMate ? null : upd.ScoreCp;
@@ -170,18 +163,18 @@ codex/bind-analysis-summary-to-board-header
             }
         }
 
-        private async Task OnBestMove(string bestmove)
+        private Task OnBestMove(string bestmove)
         {
-            if (_analyzing) return;
-            if (_game.ApplyEngineMove(bestmove))
-            {
-                Board.SetPosition(_game.Fen);
-            }
-            else
+            if (_analyzing) return Task.CompletedTask;
+            if (!_game.ApplyEngineMove(bestmove))
             {
                 AppendInfo($"Engine sent impossible bestmove: {bestmove}");
+                return Task.CompletedTask;
             }
+
+            Board.SetPosition(_game.Fen);
             AnalysisHeader = "Engine idle";
+            return Task.CompletedTask;
         }
 
         private async void BtnAnalyze_Click(object sender, RoutedEventArgs e)
@@ -193,15 +186,10 @@ codex/bind-analysis-summary-to-board-header
             await SendCommandAsync("isready");
             await _engine.ExpectAsync("readyok", TimeSpan.FromSeconds(3));
             var cfg = ConfigService.LoadAppSettings();
-/add-engine-selection-modal-to-settings-ui
-            await _engine.SendAsync(_game.ToUciPositionCommand());
-            await _engine.SendAsync("setoption name MultiPV value 3");
-            await _engine.SendAsync($"go depth {cfg.Depth}");
 
             await SendCommandAsync(_game.ToUciPositionCommand());
             await SendCommandAsync("setoption name MultiPV value 3");
-            await SendCommandAsync("go infinite");
- main
+            await SendCommandAsync($"go depth {cfg.Depth}");
         }
 
         private async void BtnStop_Click(object sender, RoutedEventArgs e)

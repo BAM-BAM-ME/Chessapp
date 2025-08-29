@@ -24,7 +24,7 @@ public class GameController
     public event Action<string>? EngineMoveApplied;
 
     public GameController(ILogger<GameController>? logger = null)
-        => _logger = logger ?? Logging.Factory.CreateLogger<GameController>();
+        
  main
 
     /// <summary>Resets to the initial chess position.</summary>

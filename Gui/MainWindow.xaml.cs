@@ -3,8 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
-using Chessapp.Core;
-using Chessapp.Interop;
+using Core;
+using Interop;
 
 namespace Gui
 {

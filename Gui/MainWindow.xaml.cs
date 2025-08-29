@@ -52,15 +52,18 @@ namespace Gui
             TxtInfo.AppendText(line + Environment.NewLine);
             TxtInfo.ScrollToEnd();
 
-            if (_insightsEnabled)
+            var upd = UciParser.TryParseInfo(line);
+            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && upd.MultiPv == 1)
             {
-                var upd = UciParser.TryParseInfo(line);
-                if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
-                {
-                    int? cp = upd.ScoreMate ? null : upd.ScoreCp;
-                    int? mate = upd.ScoreMate ? upd.ScoreCp : null;
-                    _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
-                }
+                string score = upd.ScoreMate ? $"M{upd.ScoreCp}" : (upd.ScoreCp / 100.0).ToString("0.00");
+                TxtPv.Text = $"d{upd.Depth} {score} {upd.Pv}"; // TODO: bind via MVVM
+            }
+
+            if (_insightsEnabled && upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+            {
+                int? cp = upd.ScoreMate ? null : upd.ScoreCp;
+                int? mate = upd.ScoreMate ? upd.ScoreCp : null;
+                _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
             }
         }
 
@@ -118,6 +121,7 @@ namespace Gui
 
         private void OnBestMove(string bestmove)
         {
+            TxtPv.Text = $"best {bestmove}"; // TODO: bind via MVVM
             if (_analyzing) return;
             if (_game.ApplyEngineMove(bestmove))
             {

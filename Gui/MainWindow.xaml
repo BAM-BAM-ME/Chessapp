@@ -20,6 +20,7 @@
         <Button Name="BtnStop" Content="Stop" Width="120" Margin="0,0,8,0" Click="BtnStop_Click"/>
         <Button Name="BtnLoadEngine" Content="Engine..." Width="120" Click="BtnLoadEngine_Click"/>
       </StackPanel>
+      <TextBlock Name="TxtPv" Margin="0,0,0,8" TextWrapping="Wrap"/>
       <TabControl Height="420" Margin="0,8,0,0">
         <TabItem Header="Info">
           <TextBox Name="TxtInfo" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>

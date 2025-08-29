@@ -25,6 +25,9 @@ Aplicatie Windows (.NET 8 WPF) care ruleaza Stockfish 17.1 ca engine extern prin
 - `Data/appsettings.json` setari de baza. `Data/profiles.json` contine 20 de profiluri.
 - `Engines/README.txt` explicatii pentru motor.
 
+## Insights
+ChessApp stores recent engine evaluations in a local SQLite database at `Data/insights.db`. The latest 50 entries (timestamp, depth, score, NPS and PV) are visible on the **Insights** tab. This feature is enabled by default; set `"Insights": false` in `Data/appsettings.json` to opt out.
+
 ## Blueprint
 Planul detaliat pentru evoluția aplicației, incluzând engine propriu, NNUE, optimizări Windows și GUI avansat, este descris în `docs/BLUEPRINT.md`.
 

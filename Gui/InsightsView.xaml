@@ -1,0 +1,19 @@
+<UserControl x:Class="Gui.InsightsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <DockPanel>
+        <Button Content="Refresh" DockPanel.Dock="Top" Margin="0,0,0,5" Click="Refresh_Click"/>
+        <DataGrid x:Name="Grid" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ts" Binding="{Binding Ts}" Width="120"/>
+                <DataGridTextColumn Header="Depth" Binding="{Binding Depth}" Width="60"/>
+                <DataGridTextColumn Header="Score" Binding="{Binding Score}" Width="60"/>
+                <DataGridTextColumn Header="Nps" Binding="{Binding Nps}" Width="80"/>
+                <DataGridTextColumn Header="Pv" Binding="{Binding Pv}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

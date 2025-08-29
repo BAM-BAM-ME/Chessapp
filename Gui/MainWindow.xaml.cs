@@ -64,8 +64,8 @@ namespace Gui
             {
                 if (!File.Exists(_enginePath))
                 {
-                    AppendInfo("Nu s-a gasit stockfish.exe. Alege calea cu butonul Engine...");
-                    throw new FileNotFoundException("stockfish.exe lipsa");
+                    AppendInfo("Engine not found. Set the path with the Engine button.");
+                    throw new FileNotFoundException("stockfish.exe missing");
                 }
                 _engine.Start(_enginePath);
             }
@@ -88,7 +88,7 @@ namespace Gui
             }
             else
             {
-                AppendInfo($"Mutare invalida: {from}-{to}");
+                AppendInfo($"Invalid move: {from}-{to}");
             }
         }
 
@@ -101,7 +101,7 @@ namespace Gui
             }
             else
             {
-                AppendInfo($"Engine a trimis bestmove imposibil: {bestmove}");
+                AppendInfo($"Engine sent impossible bestmove: {bestmove}");
             }
         }
 
@@ -138,7 +138,7 @@ namespace Gui
                 var cfg = ConfigService.LoadAppSettings();
                 cfg.EnginePath = _enginePath;
                 ConfigService.SaveAppSettings(cfg);
-                AppendInfo($"Engine setat: {_enginePath}");
+                AppendInfo($"Engine set: {_enginePath}");
             }
         }
     }

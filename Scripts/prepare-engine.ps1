@@ -6,7 +6,7 @@ New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
 if ($EngineZip -and (Test-Path $EngineZip)) {
     Expand-Archive -Path $EngineZip -DestinationPath $dest -Force
-    Write-Host "Arhiva expandata in $dest"
+    Write-Host "Archive expanded to $dest"
 } else {
-    Write-Host "Copiaza executabilul oficial Stockfish in folderul Engines si redenumeste-l exact: stockfish.exe"
+    Write-Host "Copy the official Stockfish executable to Engines and name it: stockfish.exe"
 }

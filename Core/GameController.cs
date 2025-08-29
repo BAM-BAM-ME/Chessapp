@@ -70,21 +70,24 @@ public class GameController
     /// <summary>
     /// Applies an engine move in UCI form. Uses the same validation as user
     /// moves and updates the internal move list. Raises <see
-    /// cref="EngineMoveApplied"/> when successful.
+    /// cref="EngineMoveApplied"/> when successful. Returns true when the move
+    /// is accepted.
     /// </summary>
-    public void ApplyEngineMove(string uci)
+    public bool ApplyEngineMove(string uci)
     {
         if (TryApplyUserMove(uci))
         {
             EngineMoveApplied?.Invoke(uci.Trim());
+            return true;
         }
+        return false;
     }
 
     /// <summary>
     /// Overload for engine move using separate components (from, to,
     /// promotion).
     /// </summary>
-    public void ApplyEngineMove(object from, object to, object? promotion = null)
+    public bool ApplyEngineMove(object from, object to, object? promotion = null)
         => ApplyEngineMove(BuildUci(from, to, promotion));
 
     // Helpers

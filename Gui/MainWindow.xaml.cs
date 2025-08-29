@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
+using Microsoft.Extensions.Logging;
 using Core;
 using Interop;
 
@@ -10,16 +11,20 @@ namespace Gui
 {
     public partial class MainWindow : Window
     {
-        private readonly GameController _game = new GameController();
-        private readonly EngineHost _engine = new EngineHost();
+        private readonly ILogger _logger;
+        private readonly GameController _game;
+        private readonly EngineHost _engine;
         private InsightsService _insights = new InsightsService();
         private readonly System.Windows.Threading.DispatcherTimer _insightsTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
         private bool _insightsEnabled = true;
         private string _enginePath = "Engines/stockfish.exe";
         private bool _analyzing = false;
 
-        public MainWindow()
+        public MainWindow(ILogger<MainWindow>? logger = null)
         {
+            _logger = logger ?? Logging.Factory.CreateLogger<MainWindow>();
+            _game = new GameController();
+            _engine = new EngineHost();
             InitializeComponent();
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
@@ -32,6 +37,7 @@ namespace Gui
             };
             _insightsTimer.Start();
             LoadSettings();
+            _logger.LogInformation("MainWindow initialized");
         }
 
         private void LoadSettings()

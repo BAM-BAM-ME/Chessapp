@@ -4,11 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Core;
 
 namespace Interop
 {
     public class EngineHost : IDisposable
     {
+        private readonly ILogger _logger;
         private Process? _proc;
         private readonly BlockingCollection<string> _outgoing = new();
         private CancellationTokenSource? _cts;
@@ -19,8 +22,14 @@ namespace Interop
         public event Action<string>? BestMoveReceived;
         public event Action<Exception>? EngineCrashed;
 
+        public EngineHost(ILogger<EngineHost>? logger = null)
+        {
+            _logger = logger ?? Logging.Factory.CreateLogger<EngineHost>();
+        }
+
         public void Start(string enginePath)
         {
+            _logger.LogInformation("Starting engine: {Path}", enginePath);
             Stop();
             _cts = new CancellationTokenSource();
             _proc = new Process
@@ -37,7 +46,11 @@ namespace Interop
                 },
                 EnableRaisingEvents = true
             };
-            _proc.Exited += (_, __) => EngineCrashed?.Invoke(new Exception("Engine process exited."));
+            _proc.Exited += (_, __) =>
+            {
+                _logger.LogWarning("Engine process exited");
+                EngineCrashed?.Invoke(new Exception("Engine process exited."));
+            };
             _proc.Start();
             Task.Run(() => WriterLoop(_cts.Token));
             Task.Run(() => ReaderLoop(_cts.Token));
@@ -46,6 +59,7 @@ namespace Interop
         public async Task SendAsync(string command)
         {
             if (!IsRunning) throw new InvalidOperationException("Engine not running");
+            _logger.LogDebug("send: {Cmd}", command);
             _outgoing.Add(command);
             await Task.CompletedTask;
         }
@@ -90,6 +104,7 @@ namespace Interop
                 {
                     string? line = await _proc!.StandardOutput.ReadLineAsync();
                     if (line is null) break;
+                    _logger.LogDebug("recv: {Line}", line);
                     if (line.StartsWith("info ")) InfoReceived?.Invoke(line);
                     else if (line.StartsWith("bestmove "))
                     {
@@ -108,6 +123,7 @@ namespace Interop
 
         public void Stop()
         {
+            _logger.LogInformation("Stopping engine");
             try
             {
                 _cts?.Cancel();

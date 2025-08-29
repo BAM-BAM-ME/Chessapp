@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Interop
 {
@@ -19,8 +20,10 @@ namespace Interop
 
     public static class UciParser
     {
-        public static InfoUpdate? TryParseInfo(string line)
+        public static InfoUpdate? TryParseInfo(string line, ILogger<UciParser>? logger = null)
         {
+            logger ??= Core.Logging.Factory.CreateLogger<UciParser>();
+            logger.LogDebug("parse: {Line}", line);
             if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("info ")) return null;
             var upd = new InfoUpdate();
             var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);

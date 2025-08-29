@@ -30,3 +30,19 @@ Planul detaliat pentru evoluția aplicației, incluzând engine propriu, NNUE, o
 
 ## Licenta si Stockfish
 Daca distribui motorul impreuna cu pachetul tau, include licenta si autorii Stockfish. Cea mai simpla varianta este sa livrezi doar GUI-ul si sa soliciti calea catre executabil la primul start.
+
+## Packaging
+The repository includes an experimental Windows Application Packaging Project.
+It is not signed and is intended for local testing.
+
+### Local build
+1. Enable **Developer Mode** or allow sideloading on your Windows machine.
+2. Open a Developer PowerShell and run `scripts\build-msix.ps1`.
+   The script restores the solution, builds the WPF project and places an unsigned `.msix` in `packaging\Artifacts`.
+   Placeholder logos are generated automatically during this step.
+3. Install the package by launching the generated `.msix`. Windows will warn about the unsigned package.
+
+### Troubleshooting
+- The script expects `msbuild` from Visual Studio to be available in `PATH`.
+- Make sure Developer Mode is enabled; otherwise Windows will refuse to install the package.
+- Code signing and Store submission are planned for later tasks.

@@ -1,0 +1,58 @@
+param(
+    [string]$Configuration = "Release"
+)
+
+$ErrorActionPreference = "Stop"
+$root = Split-Path -Parent $PSScriptRoot
+$solution = Join-Path $root "ChessApp.sln"
+$packProj = Join-Path $root "packaging\Chessapp.Package\Chessapp.Package.wapproj"
+$artifactDir = Join-Path $root "packaging\Artifacts"
+ $assetsDir = Join-Path $root "packaging\Chessapp.Package\Assets"
+
+ # Ensure placeholder assets exist (generated at build time to avoid binary files in repo)
+if (!(Test-Path $assetsDir)) {
+    New-Item -ItemType Directory -Path $assetsDir | Out-Null
+}
+
+function New-Logo($path, $size) {
+    Add-Type -AssemblyName System.Drawing
+    $bmp = New-Object System.Drawing.Bitmap $size, $size
+    $gfx = [System.Drawing.Graphics]::FromImage($bmp)
+    $gfx.Clear([System.Drawing.Color]::Transparent)
+    $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
+    $gfx.Dispose()
+    $bmp.Dispose()
+}
+
+$logos = @{ 
+    'Square150x150Logo.png' = 150;
+    'Square44x44Logo.png'   = 44;
+    'StoreLogo.png'         = 50
+}
+
+foreach ($name in $logos.Keys) {
+    $path = Join-Path $assetsDir $name
+    if (!(Test-Path $path)) {
+        New-Logo $path $logos[$name]
+    }
+}
+
+if (!(Test-Path $artifactDir)) {
+    New-Item -ItemType Directory -Path $artifactDir | Out-Null
+}
+
+Write-Host "Restoring solution..."
+msbuild $solution -t:Restore | Out-Null
+
+Write-Host "Building WPF project..."
+msbuild $solution -p:Configuration=$Configuration | Out-Null
+
+Write-Host "Building MSIX package..."
+msbuild $packProj -p:Configuration=$Configuration -p:AppxBundle=Never -p:AppxPackageSigningEnabled=false -p:AppxPackageDir="$artifactDir\" | Out-Null
+
+$package = Get-ChildItem $artifactDir -Filter *.msix -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($package) {
+    Write-Host "Package created at: $($package.FullName)"
+} else {
+    Write-Warning "No package produced. Check build output."
+}

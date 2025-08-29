@@ -10,39 +10,34 @@ ChessApp is a Windows (.NET 8 WPF) GUI that drives an external UCI engine such a
 - [Visual Studio 2022](https://visualstudio.microsoft.com/)
 - Optional UCI engine such as [`stockfish.exe`](https://stockfishchess.org/)
 
-codex/update-readme-quickstart-and-packaging-sections
 ### Run
 1. Clone the repo:
-
-1. Optionally place the engine at `Engines/stockfish.exe` with:
-
-   ```powershell
-   pwsh Scripts/prepare-engine.ps1 -Path C:\path\to\stockfish.exe
-   ```
-
-   or edit `Data/appsettings.json` to set `AppSettings.EnginePath`.
-2. Build the GUI:
- main
-
    ```powershell
    git clone <repo-url>
    cd ChessApp
    ```
-   Open `ChessApp.sln` in Visual Studio 2022.
-2. Configure the engine path: place the engine at `Engines/stockfish.exe` **or** edit `Data/appsettings.json` and set `AppSettings.EnginePath`.
-3. Set **Gui** as the startup project and run (F5).
+
+2. Optionally place the engine at `Engines/stockfish.exe`:
+   ```powershell
+   pwsh Scripts/prepare-engine.ps1 -Path C:\path\to\stockfish.exe
+   ```
+   or edit `Data/appsettings.json` and set `AppSettings.EnginePath`.
+
+3. Open `ChessApp.sln` in Visual Studio 2022.
+
+4. Set **Gui** as the startup project and run (F5).
 
 See [BUILD.md](docs/BUILD.md) for detailed instructions and [PROFILES.md](docs/PROFILES.md) for profile definitions.
 
 ## Packaging
 
-Run the PowerShell script to produce an MSIX package:
+Run the PowerShell script to stage an unsigned MSIX:
 
 ```powershell
-Scripts/build-msix.ps1
+pwsh Scripts/release-pack.ps1
 ```
 
-The packaged artifacts are written to the `artifacts` folder.
+Artifacts are written to `Artifacts/release`. Placeholder logos are generated; replace them with real artwork before a stable release.
 
 ## Troubleshooting
 

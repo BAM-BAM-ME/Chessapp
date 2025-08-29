@@ -25,12 +25,8 @@ Aplicatie Windows (.NET 8 WPF) care ruleaza Stockfish 17.1 ca engine extern prin
 - `Data/appsettings.json` setari de baza. `Data/profiles.json` contine 20 de profiluri.
 - `Engines/README.txt` explicatii pentru motor.
 
-## Blueprint pe scurt pentru extindere
-- Faza 1: EngineHost si handshake UCI stabil. 
-- Faza 2: Panou analiza MultiPV si grafic evaluare.
-- Faza 3: Profiles Service si selector de profil.
-- Faza 4: SQLite si User Learning + Insights dashboard.
-- Faza 5: Packaging MSIX si semnare cod.
+## Blueprint
+Planul detaliat pentru evoluția aplicației, incluzând engine propriu, NNUE, optimizări Windows și GUI avansat, este descris în `docs/BLUEPRINT.md`.
 
 ## Licenta si Stockfish
 Daca distribui motorul impreuna cu pachetul tau, include licenta si autorii Stockfish. Cea mai simpla varianta este sa livrezi doar GUI-ul si sa soliciti calea catre executabil la primul start.

@@ -45,8 +45,8 @@ ChessApp este un GUI de șah pentru Windows (WPF, .NET 8) care rulează un motor
 ```
 > Notă: Scripturile PowerShell din `scripts/` folosesc aliasul `engine.path`. Păstrează-l sincron cu `EnginePath` sau păstrează ambele chei cu aceeași valoare.
 
-### Profiluri (`Data/profiles.json`)
-Câmpuri uzuale: `name`, `uci{...}`, `move_policy{deterministic, top_k}`, `book{enabled, allow[]}`. Vezi `PROFILES.md` și `EXAMPLES.md`.
+### Profiles (`Data/profiles.json`)
+Common fields: `name`, `uci{...}`, `move_policy{deterministic, top_k}`, `book{path?, allow[]}`. See `PROFILES.md` and `EXAMPLES.md`.
 
 ## Blueprint & Roadmap
 **F1 – EngineHost & UCI handshake:** lifecycle robust, timeouts deterministe, `setoption` corecte.  

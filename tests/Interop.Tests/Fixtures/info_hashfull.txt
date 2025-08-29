@@ -1,0 +1,2 @@
+info depth 25 seldepth 32 score cp 13 nodes 123456 nps 765432 hashfull 512 multipv 2 pv e2e4 e7e5 g1f3
+info depth 15 seldepth 22 score mate -3 nodes 2048 nps 8192 hashfull 873 multipv 1 pv d2d4 d7d5

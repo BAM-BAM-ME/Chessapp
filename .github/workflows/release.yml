@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release
+      - name: Prepare package
+        shell: pwsh
+        run: ./Scripts/release-pack.ps1
+      - name: Create archive
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $zipPath = "Artifacts/Chessapp-$tag-win64.zip"
+          Compress-Archive -Path "Artifacts/release/*" -DestinationPath $zipPath
+          echo "ZIP_PATH=$zipPath" >> $env:GITHUB_ENV
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Chessapp ${{ github.ref_name }}
+          files: ${{ env.ZIP_PATH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,4 +1,5 @@
-Notificări Terți pentru ChessApp
+Third-Party Notices for ChessApp
 
-Acest proiect poate utiliza motorul Stockfish (GPLv3) ca proces separat.
-Dacă distribui motorul în pachetul aplicației, **include obligatoriu** `LICENSE` și `AUTHORS` din distribuția Stockfish. Dacă livrezi GUI-only, explică utilizatorului cum să indice calea către motor.
+This project may use the Stockfish chess engine (GPLv3) as a separate process.
+If you distribute the engine with the application, you **must** include the official `LICENSE` and `AUTHORS` files from the Stockfish distribution. If you ship the GUI alone, instruct the user how to point the app to the engine.
+

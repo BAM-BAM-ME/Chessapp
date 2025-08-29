@@ -17,7 +17,7 @@
 Furnizează certificatul PFX ca secret de repo (`SIGNING_CERT` în base64) și parola (`SIGNING_PASS`). Decodează în CI și rulează `signtool`:
 
 ```powershell
-# scripts/sign-msix.ps1
+# Scripts/sign-msix.ps1
 $certPath = "$env:RUNNER_TEMP\cert.pfx"
 [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String($env:SIGNING_CERT))
 signtool sign /fd SHA256 /a /f $certPath /p $env:SIGNING_PASS out/installer/Chessapp.msix

@@ -4,33 +4,40 @@
         xmlns:controls="clr-namespace:Gui.Controls"
         xmlns:local="clr-namespace:Gui"
         Title="ChessApp - Stockfish 17.1" Height="720" Width="1024">
-  <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="280"/>
-      <ColumnDefinition Width="*"/>
-    </Grid.ColumnDefinitions>
+  <DockPanel>
+    <Expander Header="Engine" DockPanel.Dock="Bottom" IsExpanded="False">
+      <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto">
+        <TextBlock FontFamily="Consolas" Text="{Binding EngineLog}" TextWrapping="Wrap"/>
+      </ScrollViewer>
+    </Expander>
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
 
-    <StackPanel Margin="8" Grid.Column="0">
-      <TextBlock Text="Engine control" FontWeight="Bold" Margin="0,0,0,8"/>
-      <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-        <Button Name="BtnStart" Content="Start game" Width="120" Margin="0,0,8,0" Click="BtnStart_Click"/>
-        <Button Name="BtnAnalyze" Content="Analyze" Width="120" Click="BtnAnalyze_Click"/>
+      <StackPanel Margin="8" Grid.Column="0">
+        <TextBlock Text="Engine control" FontWeight="Bold" Margin="0,0,0,8"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+          <Button Name="BtnStart" Content="Start game" Width="120" Margin="0,0,8,0" Click="BtnStart_Click"/>
+          <Button Name="BtnAnalyze" Content="Analyze" Width="120" Click="BtnAnalyze_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+          <Button Name="BtnStop" Content="Stop" Width="120" Margin="0,0,8,0" Click="BtnStop_Click"/>
+          <Button Name="BtnLoadEngine" Content="Engine..." Width="120" Click="BtnLoadEngine_Click"/>
+        </StackPanel>
+        <TextBlock Name="TxtPv" Margin="0,0,0,8" TextWrapping="Wrap"/>
+        <TabControl Height="420" Margin="0,8,0,0">
+          <TabItem Header="Info">
+            <TextBox Name="TxtInfo" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+          </TabItem>
+          <TabItem Header="Insights">
+            <local:InsightsView x:Name="InsightsPanel"/>
+          </TabItem>
+        </TabControl>
       </StackPanel>
-      <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-        <Button Name="BtnStop" Content="Stop" Width="120" Margin="0,0,8,0" Click="BtnStop_Click"/>
-        <Button Name="BtnLoadEngine" Content="Engine..." Width="120" Click="BtnLoadEngine_Click"/>
-      </StackPanel>
-      <TextBlock Name="TxtPv" Margin="0,0,0,8" TextWrapping="Wrap"/>
-      <TabControl Height="420" Margin="0,8,0,0">
-        <TabItem Header="Info">
-          <TextBox Name="TxtInfo" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
-        </TabItem>
-        <TabItem Header="Insights">
-          <local:InsightsView x:Name="InsightsPanel"/>
-        </TabItem>
-      </TabControl>
-    </StackPanel>
 
-    <controls:BoardControl x:Name="Board" Grid.Column="1" Margin="8"/>
-  </Grid>
+      <controls:BoardControl x:Name="Board" Grid.Column="1" Margin="8"/>
+    </Grid>
+  </DockPanel>
 </Window>

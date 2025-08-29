@@ -24,8 +24,9 @@ public class GameController
     }
 
     /// <summary>
-    /// Builds the UCI position command from current state.
-    /// Example: "position startpos" or "position startpos moves e2e4 e7e5".
+    /// Returns a UCI "position" command reflecting the current state.
+    /// Returns "position startpos" when no moves have been recorded;
+    /// otherwise "position startpos moves" followed by the move list.
     /// </summary>
     public string ToUciPositionCommand()
     {

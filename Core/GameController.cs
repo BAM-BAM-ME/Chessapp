@@ -19,7 +19,7 @@ public class GameController
     // Very small move list so the GUI can build a UCI "position" command.
     private readonly List<string> _moves = new();
 
-/add-method-to-apply-engine-move
+
     /// <summary>Raised whenever an engine move is applied.</summary>
     public event Action<string>? EngineMoveApplied;
 

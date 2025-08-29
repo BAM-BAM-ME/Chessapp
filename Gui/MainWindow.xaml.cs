@@ -23,7 +23,7 @@ namespace Gui
             InitializeComponent();
             Board.MoveRequested += OnUserMoveRequested;
             _engine.InfoReceived += line => Dispatcher.Invoke(() => AppendInfo(line));
-            _engine.BestMoveReceived += move => Dispatcher.Invoke(() => OnBestMove(move));
+            _engine.BestMoveReceived += move => Dispatcher.Invoke(async () => await OnBestMove(move));
             _engine.EngineReady += () => Dispatcher.Invoke(() => AppendInfo("readyok"));
             _insightsTimer.Tick += async (_, __) =>
             {
@@ -52,18 +52,15 @@ namespace Gui
             TxtInfo.AppendText(line + Environment.NewLine);
             TxtInfo.ScrollToEnd();
 
-            var upd = UciParser.TryParseInfo(line);
-            if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && upd.MultiPv == 1)
+            if (_insightsEnabled)
             {
-                string score = upd.ScoreMate ? $"M{upd.ScoreCp}" : (upd.ScoreCp / 100.0).ToString("0.00");
-                TxtPv.Text = $"d{upd.Depth} {score} {upd.Pv}"; // TODO: bind via MVVM
-            }
-
-            if (_insightsEnabled && upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
-            {
-                int? cp = upd.ScoreMate ? null : upd.ScoreCp;
-                int? mate = upd.ScoreMate ? upd.ScoreCp : null;
-                _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
+                var upd = UciParser.TryParseInfo(line);
+                if (upd != null && !string.IsNullOrWhiteSpace(upd.Pv) && line.Contains(" score "))
+                {
+                    int? cp = upd.ScoreMate ? null : upd.ScoreCp;
+                    int? mate = upd.ScoreMate ? upd.ScoreCp : null;
+                    _ = _insights.AppendAsync(_game.Fen, upd.Depth, cp, mate, upd.Nps, upd.Pv);
+                }
             }
         }
 
@@ -93,7 +90,7 @@ namespace Gui
                     AppendInfo("Engine not found. Set the path with the Engine button.");
                     throw new FileNotFoundException("stockfish.exe missing");
                 }
-                await Task.Run(() => _engine.Start(_enginePath)); // avoid blocking UI thread
+                _engine.Start(_enginePath);
             }
         }
 
@@ -119,9 +116,8 @@ namespace Gui
             }
         }
 
-        private void OnBestMove(string bestmove)
+        private async Task OnBestMove(string bestmove)
         {
-            TxtPv.Text = $"best {bestmove}"; // TODO: bind via MVVM
             if (_analyzing) return;
             if (_game.ApplyEngineMove(bestmove))
             {

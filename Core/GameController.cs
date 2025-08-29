@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Core;
 
@@ -8,6 +9,7 @@ namespace Core;
 /// </summary>
 public class GameController
 {
+    private readonly ILogger _logger;
     public const string StartFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1";
 
     /// <summary>Current position in Forsyth–Edwards Notation.</summary>
@@ -16,11 +18,15 @@ public class GameController
     // Very small move list so the GUI can build a UCI "position" command.
     private readonly List<string> _moves = new();
 
+    public GameController(ILogger<GameController>? logger = null)
+        => _logger = logger ?? Logging.Factory.CreateLogger<GameController>();
+
     /// <summary>Resets to the initial chess position.</summary>
     public void NewGame()
     {
         Fen = StartFen;
         _moves.Clear();
+        _logger.LogInformation("New game started");
     }
 
     /// <summary>

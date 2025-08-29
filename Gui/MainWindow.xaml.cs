@@ -104,31 +104,28 @@ namespace Gui
         private async void OnUserMoveRequested(string from, string to, string? promo)
         {
             if (_analyzing) return;
-            var uci = from + to + (promo ?? string.Empty);
-            if (_game.TryApplyUserMove(uci, out var err))
+            var uci = (from ?? string.Empty) + (to ?? string.Empty) + (promo ?? string.Empty);
+            if (_game.TryApplyUserMove(uci))
             {
                 Board.SetPosition(_game.Fen);
                 await GoAsync();
             }
             else
             {
-                AppendInfo(err ?? $"Invalid move: {uci}");
+                AppendInfo($"Invalid move: {uci}");
             }
         }
 
         private async Task OnBestMove(string bestmove)
         {
             if (_analyzing) return;
-            if (false) // TODO(V1.3): apply engine move once API is available
+            if (_game.ApplyEngineMove(bestmove))
             {
-                if (_game.ApplyEngineMove(bestmove))
-                {
-                    Board.SetPosition(_game.Fen);
-                }
-                else
-                {
-                    AppendInfo($"Engine sent impossible bestmove: {bestmove}");
-                }
+                Board.SetPosition(_game.Fen);
+            }
+            else
+            {
+                AppendInfo($"Engine sent impossible bestmove: {bestmove}");
             }
         }
 

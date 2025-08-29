@@ -56,9 +56,13 @@ public class GameController
         var s = uci.Trim();
         if (s.Length is 4 or 5)
         {
-            _moves.Add(s);
-            // TODO: Update FEN based on moves (out of current scope)
-            return true;
+            if (FenUtility.TryApplyMove(Fen, s, out var newFen))
+            {
+                _moves.Add(s);
+                Fen = newFen;
+                return true;
+            }
+            return false;
         }
         return false;
     }

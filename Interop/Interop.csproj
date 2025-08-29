@@ -3,10 +3,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
-    <!-- Interop depends on Core for shared contracts (no reverse reference) -->
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 </Project>

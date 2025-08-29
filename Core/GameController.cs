@@ -3,8 +3,8 @@ using System.Collections.Generic;
 namespace Core;
 
 /// <summary>
-/// Minimal game controller that keeps only board state and simple UCI plumbing
-/// required by the GUI. No dependency on Interop.
+/// Minimal game controller that tracks basic game state (FEN + move list) and
+/// provides a tiny UCI-facing API for the GUI. No dependency on Interop.
 /// </summary>
 public class GameController
 {
@@ -13,7 +13,7 @@ public class GameController
     /// <summary>Current position in Forsyth–Edwards Notation.</summary>
     public string Fen { get; private set; } = StartFen;
 
-    // Keep a very small move list so the GUI can build a UCI "position" command.
+    // Very small move list so the GUI can build a UCI "position" command.
     private readonly List<string> _moves = new();
 
     /// <summary>Resets to the initial chess position.</summary>
@@ -25,7 +25,7 @@ public class GameController
 
     /// <summary>
     /// Builds the UCI position command from current state.
-    /// Example outputs: "position startpos" or "position startpos moves e2e4 e7e5".
+    /// Example: "position startpos" or "position startpos moves e2e4 e7e5".
     /// </summary>
     public string ToUciPositionCommand()
     {
@@ -35,8 +35,7 @@ public class GameController
 
     /// <summary>
     /// Tries to apply a user move given in UCI (e.g., "e2e4" or "e7e8q").
-    /// For now, accepts basic 4/5-char forms and records it without recomputing FEN.
-    /// Returns true if accepted.
+    /// Accepts 4/5-character strings. Returns true if accepted.
     /// </summary>
     public bool TryApplyUserMove(string uci)
     {
@@ -45,21 +44,54 @@ public class GameController
         if (s.Length is 4 or 5)
         {
             _moves.Add(s);
-            // TODO: Update FEN based on moves (out of scope for this build fix)
+            // TODO: Update FEN based on moves (out of current scope)
             return true;
         }
         return false;
     }
 
     /// <summary>
-    /// Applies an engine move in UCI form. Currently records the move only.
+    /// Overload used by GUI callers that supply separate components (from, to, promotion).
+    /// Types are kept wide (object) to accommodate either strings (e.g., "e2") or indices (0..63).
     /// </summary>
-    public void ApplyEngineMove(string uci)
+    public bool TryApplyUserMove(object from, object to, object? promotion = null)
+        => TryApplyUserMove(BuildUci(from, to, promotion));
+
+    /// <summary>
+    /// Applies an engine move in UCI form. Returns true if recorded.
+    /// </summary>
+    public bool ApplyEngineMove(string uci) => TryApplyUserMove(uci);
+
+    /// <summary>
+    /// Overload for engine move using separate components (from, to, promotion).
+    /// Returns true if recorded.
+    /// </summary>
+    public bool ApplyEngineMove(object from, object to, object? promotion = null)
+        => TryApplyUserMove(BuildUci(from, to, promotion));
+
+    // Helpers
+    private static string BuildUci(object from, object to, object? promotion)
     {
-        if (!string.IsNullOrWhiteSpace(uci))
+        // If indices are provided (0..63), convert to algebraic (a1..h8)
+        string fromStr = ConvertSquare(from);
+        string toStr   = ConvertSquare(to);
+        string promo   = promotion?.ToString()?.Trim() ?? string.Empty;
+        return fromStr + toStr + promo;
+    }
+
+    private static string ConvertSquare(object value)
+    {
+        // Accept either algebraic like "e2" or zero-based index 0..63
+        var s = value?.ToString()?.Trim() ?? string.Empty;
+        if (int.TryParse(s, out var idx) && idx >= 0 && idx < 64)
         {
-            _moves.Add(uci.Trim());
-            // TODO: Update FEN based on moves (out of scope for this build fix)
+            int file = idx % 8;        // 0..7
+            int rank = idx / 8;        // 0..7
+            char f = (char)('a' + file);
+            char r = (char)('1' + rank);
+            return $"{f}{r}";
         }
+        // fall back to original string (assumed like "e2")
+        return s;
     }
 }
